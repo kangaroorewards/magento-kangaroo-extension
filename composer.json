@@ -10,16 +10,6 @@
     "files": [
       "registration.php"
     ]
-  },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://tractroc.git.beanstalkapp.com/magento-kangaroo-extension.git"
-    }
-  ],
-  "require": {
-    "magento-kangaroo-extension": "dev-master"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
+  "minimum-stability": "dev"
 }
