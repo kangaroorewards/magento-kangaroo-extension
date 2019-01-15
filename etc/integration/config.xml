@@ -1,0 +1,7 @@
+<integrations>
+    <integration name="Kangaroorewards">
+        <email>info@kangaroorewards.com</email>
+        <endpoint_url>http://aa3c9a13.ngrok.io/pos/magento/endpoint</endpoint_url>
+        <identity_link_url>http://aa3c9a13.ngrok.io/pos/magento/login</identity_link_url>
+    </integration>
+</integrations>

@@ -1,0 +1,150 @@
+<?php
+
+
+?>
+
+<link rel="stylesheet" href="<?php echo $block->getKangarooAPIUrl(); ?>/magento/initCss?storeId=<?php echo $block->getStoreId(); ?>&amp;domain=<?php echo  urlencode($block->getBaseStoreUrl()); ?>" type="text/css">
+<div class="kangaroo-container">
+    <div class="wrapper">
+        <div class="arrow arrow-top"></div>
+        <div class="kangaroo-inner">
+            <div class="kangaroo-controls">
+                <a class="hide">x</a>
+            </div>
+            <div class="kangaroo-items">
+                <div class="message points item"></div>
+            </div>
+        </div>
+        <div class="arrow kangaroo-arrow"></div>
+    </div>
+</div>
+<div class="kangaroo-widget">
+    <div class="kangaroo-wrapper">
+        <div class="points">
+            <span class="amount"></span>
+        </div>
+        <div class="name-box">
+            <div class="arrow">
+                <span class="icon icon-up-arrow"></span>
+            </div>
+            <span class="name"></span>
+        </div>
+        <br style="clear:both">
+    </div>
+</div>
+<div class="kangaroo-welcome-overlay">
+    <div class="kangaroo-welcome-modal">
+    </div>
+</div>
+
+
+
+<script>
+    var KangarooApps = KangarooApps || {};
+    var productList = [];
+    var productDetails = [];
+    KangarooApps.Loyalties = KangarooApps.Loyalties || {}
+    KangarooApps.Loyalties.my_account_login = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/login/";
+    KangarooApps.Loyalties.my_account_register = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/create/";
+    KangarooApps.Loyalties.my_account_page = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/login/";
+
+    <?php
+    if($block->isProductPage()){
+    $product = $block->getCurrentProduct();
+
+    $productL = $product['product'];
+
+    foreach($productL as $productDetail)
+    {
+    ?>
+    var productD = {
+        code: '<?php echo $productDetail["code"];?>',
+        productId: '<?php echo $productDetail["productId"];?>',
+        price: '<?php echo $productDetail["price"]; ?>',
+        title: '<?php echo $productDetail["title"]; ?>'
+    };
+    productDetails.push(productD);
+
+
+    <?php
+    }
+
+    ?>
+
+    KangarooApps.Loyalties.product = {
+        id: "<?php echo $product['code']?>",
+        product: productDetails
+    }
+
+<?php }
+if($block->getCart()){
+$cart = $block->getCart();
+$items = $cart->getAllItems();
+foreach($items as $item){
+$parent = $item->getParentItem();
+if ($item->getProductType() == 'simple') {
+?>
+
+   var product = {
+       "code": '<?php echo $item->getSku();?>',
+       "variant_id": '<?php echo $item->getProductId();?>',
+       "price": '<?php echo isset($parent) ? $parent->getPrice() : $item->getPrice(); ?>',
+       "quantity": '<?php echo isset($parent) ? $parent->getQty() : $item->getQty(); ?>'
+   };
+   productList.push(product);
+
+   <?php
+   }
+}
+?>
+if(productList != undefined && productList.length > 0){
+KangarooApps.Loyalties.checkout = {
+       total:"<?php echo $cart->getSubtotal(); ?>",
+       cart: "<?php echo $cart->getId(); ?>",
+       productList: productList,
+       discount: '<?php echo $cart->getSubtotal() - $cart->getSubtotalWithDiscount(); ?>',
+       subtotal: '<?php echo $cart->getSubtotal(); ?>'
+  }
+}
+<?php
+}
+?>
+   KangarooApps.Loyalties.shop = {
+       domain: '<?php echo $block->getBaseStoreUrl(); ?>',
+       storeId:'<?php echo $block->getStoreId(); ?>'
+   };
+
+   var localData = localStorage.getItem('mage-cache-storage');
+   if(localData !== undefined){
+       localData = JSON.parse(localData);
+       if(localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null){
+	   KangarooApps.Loyalties.customer = {
+                id: localData['kangaroo-customer']['customer']['id'],
+                email: localData['kangaroo-customer']['customer']['email']
+           }
+       }
+   }
+
+jQuery(document).on('ajaxComplete', function (event, xhr, settings)  {
+	if(KangarooApps.Loyalties.customer=== undefined){
+          localData = localStorage.getItem('mage-cache-storage');
+   	  if(localData !== undefined){
+            localData = JSON.parse(localData);
+   	    if(localData !== undefined){
+               if(localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null){
+	       KangarooApps.Loyalties.customer = {
+                 id: localData['kangaroo-customer']['customer']['id'],
+                 email: localData['kangaroo-customer']['customer']['email']
+                 }
+		 jQuery.getScript("<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS");
+               }
+            }
+          }
+	}
+});
+
+</script>
+
+
+<script  type="text/javascript"  src="<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS"></script>
+

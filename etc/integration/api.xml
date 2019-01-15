@@ -1,0 +1,16 @@
+<integrations>
+    <integration name="Kangaroorewards">
+        <resources>
+            <!-- all customer resources -->
+            <resource name="Magento_Customer::customer" />
+            <resource name="Magento_Backend::store" />
+            <resource name="Magento_Backend::admin" />
+            <resource name="Magento_Backend::marketing" />
+            <resource name="Magento_CatalogRule::promo" />
+            <resource name="Magento_SalesRule::quote" />
+            <resource name="Magento_Catalog::catalog" />
+            <resource name="Magento_Catalog::catalog_inventory" />
+            <resource name="Magento_Catalog::products" />
+        </resources>
+    </integration>
+</integrations>
