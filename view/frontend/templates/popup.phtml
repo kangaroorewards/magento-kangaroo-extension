@@ -125,23 +125,29 @@ KangarooApps.Loyalties.checkout = {
        }
    }
 
-jQuery(document).on('ajaxComplete', function (event, xhr, settings)  {
-	if(KangarooApps.Loyalties.customer=== undefined){
-          localData = localStorage.getItem('mage-cache-storage');
-   	  if(localData !== undefined){
-            localData = JSON.parse(localData);
-   	    if(localData !== undefined){
-               if(localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null){
-	       KangarooApps.Loyalties.customer = {
-                 id: localData['kangaroo-customer']['customer']['id'],
-                 email: localData['kangaroo-customer']['customer']['email']
-                 }
-		 jQuery.getScript("<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS");
+   require([
+        "jquery"
+    ], function ($) {
+
+       $(document).on('ajaxComplete', function (event, xhr, settings) {
+           if (KangarooApps.Loyalties.customer === undefined) {
+               localData = localStorage.getItem('mage-cache-storage');
+               if (localData !== undefined) {
+                   localData = JSON.parse(localData);
+                   if (localData !== undefined) {
+                       if (localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
+                           KangarooApps.Loyalties.customer = {
+                               id: localData['kangaroo-customer']['customer']['id'],
+                               email: localData['kangaroo-customer']['customer']['email']
+                           }
+                           $.getScript("<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS");
+                       }
+                   }
                }
-            }
-          }
-	}
-});
+           }
+       });
+   });
+
 
 </script>
 
