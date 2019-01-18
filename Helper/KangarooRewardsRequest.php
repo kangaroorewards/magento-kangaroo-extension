@@ -5,7 +5,7 @@ use OAuth\Common\Http\Uri\Uri;
 class KangarooRewardsRequest
 {
     private $_token;
-    private static $_baseUri = 'https://faf8942c.ngrok.io';
+    private static $_baseUri = 'https://integ-api-dev.traktrok.com/';
     private $_timeout = 30;
 
     public function __construct($key = '')
