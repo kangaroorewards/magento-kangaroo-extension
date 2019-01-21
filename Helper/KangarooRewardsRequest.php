@@ -1,24 +1,52 @@
 <?php
+/**
+ * Prepare for send request to kangaroo api
+ */
 namespace Kangaroorewards\Core\Helper;
 use OAuth\Common\Http\Uri\Uri;
 
+/**
+ * Class KangarooRewardsRequest
+ *
+ * @package Kangaroorewards\Core\Helper
+ */
 class KangarooRewardsRequest
 {
     private $_token;
     private static $_baseUri = 'https://integ-api-dev.traktrok.com/';
     private $_timeout = 30;
 
+    /**
+     * KangarooRewardsRequest constructor.
+     *
+     * @param string $key
+     */
     public function __construct($key = '')
     {
         $this->_token = $key;
     }
 
+    /**
+     * @param $path
+     * @param array $data
+     * @return mixed
+     */
     public function post($path, $data = array())
     {
-        return $this->request(\Zend\Http\Request::METHOD_POST, $path, $data);
+        return $this->_request(
+            \Zend\Http\Request::METHOD_POST,
+            $path,
+            $data
+        );
     }
 
-    private function request($method, $path, $data)
+    /**
+     * @param $method
+     * @param $path
+     * @param $data
+     * @return mixed
+     */
+    private function _request($method, $path, $data)
     {
         $uriPath = self::getKangarooAPIUrl() . '/' . $path;
         $uri = new Uri($uriPath);
@@ -26,11 +54,13 @@ class KangarooRewardsRequest
         $request = new \Zend\Http\Request();
         if ($this->_token != '') {
             $httpHeaders = new \Zend\Http\Headers();
-            $httpHeaders->addHeaders([
-                'x-signature' => $this->getSignature($this->_token, $uri, $data),
+            $httpHeaders->addHeaders(
+                [
+                'x-signature' => $this->_getSignature($this->_token, $uri, $data),
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json'
-            ]);
+                ]
+            );
             $request->setHeaders($httpHeaders);
         }
         $request->setUri($uriPath);
@@ -52,8 +82,18 @@ class KangarooRewardsRequest
         return $response;
     }
 
-    private function getSignature(string $signKey, Uri $uri, array $params, $method = 'POST')
-    {
+    /**
+     * @param string $signKey
+     * @param Uri    $uri
+     * @param array  $params
+     * @param string $method
+     * @return string
+     */
+    private function _getSignature(string $signKey,
+        Uri $uri,
+        array $params,
+        $method = 'POST'
+    ) {
         $queryStringData = !$uri->getQuery() ? [] : array_reduce(
             explode('&', $uri->getQuery()),
             function ($carry, $item) {
@@ -71,9 +111,16 @@ class KangarooRewardsRequest
         ksort($signatureData);
 
         $baseString = strtoupper($method) . '&';
-        $baseString .= rawurlencode($this->buildSignatureDataString($signatureData));
+        $baseString .= rawurlencode($this->_buildSignatureDataString($signatureData));
 
-        return base64_encode(hash_hmac('sha512', $baseString, rawurlencode($signKey), true));
+        return base64_encode(
+            hash_hmac(
+                'sha512',
+                $baseString,
+                rawurlencode($signKey),
+                true
+            )
+        );
     }
 
     /**
@@ -81,7 +128,7 @@ class KangarooRewardsRequest
      *
      * @return string
      */
-    private function buildSignatureDataString(array $signatureData)
+    private function _buildSignatureDataString(array $signatureData)
     {
         $signatureString = '';
         $delimiter = '';
@@ -94,6 +141,9 @@ class KangarooRewardsRequest
         return $signatureString;
     }
 
+    /**
+     * @return string
+     */
     public static function getKangarooAPIUrl()
     {
         $url = rtrim(self::$_baseUri, '/');

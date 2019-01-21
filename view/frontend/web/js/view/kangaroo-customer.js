@@ -1,13 +1,19 @@
-define(["uiComponent", "Magento_Customer/js/customer-data"], function(
-  Component,
-  customerData
-) {
-  "use strict";
+define(
+    ["uiComponent", "Magento_Customer/js/customer-data"], function (
+        Component,
+        customerData
+    ) {
+        "use strict";
   
-  return Component.extend({
-        initialize: function () {
-            this._super();
-            this.kangarooCustomer = customerData.get('kangaroo-customer');
-	}
-    });
-});
+        return Component.extend(
+            {
+                initialize: function () {
+                    this._super();
+                    this.kangarooCustomer = customerData.get('kangaroo-customer');
+                }
+            }
+        );
+    }
+);
+
+

@@ -1,17 +1,34 @@
 <?php
-
+/**
+ * Retrieve order data for calculation points
+ */
 namespace Kangaroorewards\Core\Model;
 
+/**
+ * Class Order
+ *
+ * @package Kangaroorewards\Core\Model
+ */
 class Order
 {
     private $_order;
 
+    /**
+     * Order constructor.
+     *
+     * @param $order
+     */
     public function __construct($order)
     {
         $this->_order = $order;
     }
 
 
+    /**
+     * Prepare order data array for kangaroo request
+     *
+     * @return array
+     */
     public function getOrderData()
     {
         $data = array();
@@ -37,10 +54,13 @@ class Order
         foreach ($orderItems as $orderProduct) {
             $parent = $orderProduct->getParentItem();
             if ($orderProduct->getProductType() == 'simple') {
-                $data['order']['orderItems'][] = array('code' => $orderProduct->getSku(),
+                $data['order']['orderItems'][] = array(
+                    'code' => $orderProduct->getSku(),
                     'productId' => $orderProduct->getProductId(),
                     'title' => $orderProduct->getName(),
-                    'price' => isset($parent) ? $parent->getPrice() : $orderProduct->getPrice(),
+                    'price' => isset($parent) ?
+                        $parent->getPrice() :
+                        $orderProduct->getPrice(),
                     'qtyOrdered' => $orderProduct->getQtyOrdered()
                 );
             }

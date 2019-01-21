@@ -1,8 +1,3 @@
-<?php
-
-
-?>
-
 <link rel="stylesheet" href="<?php echo $block->getKangarooAPIUrl(); ?>/magento/initCss?storeId=<?php echo $block->getStoreId(); ?>&amp;domain=<?php echo  urlencode($block->getBaseStoreUrl()); ?>" type="text/css">
 <div class="kangaroo-container">
     <div class="wrapper">
@@ -38,117 +33,26 @@
 </div>
 
 
-
 <script>
-    var KangarooApps = KangarooApps || {};
-    var productList = [];
-    var productDetails = [];
-    KangarooApps.Loyalties = KangarooApps.Loyalties || {}
-    KangarooApps.Loyalties.my_account_login = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/login/";
-    KangarooApps.Loyalties.my_account_register = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/create/";
-    KangarooApps.Loyalties.my_account_page = "<?php echo $block->getBaseStoreUrl(); ?>customer/account/login/";
-
-    <?php
-    if($block->isProductPage()){
-    $product = $block->getCurrentProduct();
-
-    $productL = $product['product'];
-
-    foreach($productL as $productDetail)
-    {
-    ?>
-    var productD = {
-        code: '<?php echo $productDetail["code"];?>',
-        productId: '<?php echo $productDetail["productId"];?>',
-        price: '<?php echo $productDetail["price"]; ?>',
-        title: '<?php echo $productDetail["title"]; ?>'
-    };
-    productDetails.push(productD);
-
-
-    <?php
-    }
-
-    ?>
-
-    KangarooApps.Loyalties.product = {
-        id: "<?php echo $product['code']?>",
-        product: productDetails
-    }
-
-<?php }
-if($block->getCart()){
-$cart = $block->getCart();
-$items = $cart->getAllItems();
-foreach($items as $item){
-$parent = $item->getParentItem();
-if ($item->getProductType() == 'simple') {
-?>
-
-   var product = {
-       "code": '<?php echo $item->getSku();?>',
-       "variant_id": '<?php echo $item->getProductId();?>',
-       "price": '<?php echo isset($parent) ? $parent->getPrice() : $item->getPrice(); ?>',
-       "quantity": '<?php echo isset($parent) ? $parent->getQty() : $item->getQty(); ?>'
-   };
-   productList.push(product);
-
-   <?php
-   }
-}
-?>
-if(productList != undefined && productList.length > 0){
-KangarooApps.Loyalties.checkout = {
-       total:"<?php echo $cart->getSubtotal(); ?>",
-       cart: "<?php echo $cart->getId(); ?>",
-       productList: productList,
-       discount: '<?php echo $cart->getSubtotal() - $cart->getSubtotalWithDiscount(); ?>',
-       subtotal: '<?php echo $cart->getSubtotal(); ?>'
-  }
-}
-<?php
-}
-?>
-   KangarooApps.Loyalties.shop = {
-       domain: '<?php echo $block->getBaseStoreUrl(); ?>',
-       storeId:'<?php echo $block->getStoreId(); ?>'
-   };
-
-   var localData = localStorage.getItem('mage-cache-storage');
-   if(localData !== undefined){
-       localData = JSON.parse(localData);
-       if(localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null){
-	   KangarooApps.Loyalties.customer = {
-                id: localData['kangaroo-customer']['customer']['id'],
-                email: localData['kangaroo-customer']['customer']['email']
-           }
-       }
-   }
-
-   require([
-        "jquery"
-    ], function ($) {
-
-       $(document).on('ajaxComplete', function (event, xhr, settings) {
-           if (KangarooApps.Loyalties.customer === undefined) {
-               localData = localStorage.getItem('mage-cache-storage');
-               if (localData !== undefined) {
-                   localData = JSON.parse(localData);
-                   if (localData !== undefined) {
-                       if (localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
-                           KangarooApps.Loyalties.customer = {
-                               id: localData['kangaroo-customer']['customer']['id'],
-                               email: localData['kangaroo-customer']['customer']['email']
-                           }
-                           $.getScript("<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS");
-                       }
-                   }
-               }
-           }
-       });
-       $.getScript("<?php echo $block->getKangarooAPIUrl(); ?>/magento/initJS");
-   });
-
-
+    var KangarooApps;
 </script>
+
+<script type="text/x-magento-init">
+        {
+            "*": {
+                "Kangaroorewards_Core/js/main": {
+                    "baseStoreUrl": "<?php echo $block->getBaseStoreUrl(); ?>",
+                    "storeId":<?php echo $block->getStoreId(); ?>,
+                    "isProductPage":<?php echo (int)$block->isProductPage(); ?>,
+                    "currentProduct": <?php echo json_encode($block->getCurrentProduct());?>,
+                    "isCartExist": <?php echo (int)$block->isShoppingCartExist(); ?>,
+                    "kangarooAPIUrl":"<?php echo $block->getKangarooAPIUrl(); ?>",
+                    "cart": <?php echo json_encode($block->getCart()); ?>
+                }
+            }
+        }
+</script>
+
+
+
 
