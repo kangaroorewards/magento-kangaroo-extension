@@ -46,9 +46,9 @@ define(
                     function (item) {
                         var productItem = {
                             code: item["code"],
-                            productId: item["productId"],
+                            variant_id: item["productId"],
                             price: item["price"],
-                            title: item["quantity"]
+                            quantity: item["quantity"]
                         };
                         productList.push(productItem);
                     }
