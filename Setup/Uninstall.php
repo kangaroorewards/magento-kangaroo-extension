@@ -25,6 +25,18 @@ class Uninstall implements UninstallInterface
             ->get('\Magento\Integration\Model\IntegrationFactory');
         $oauthService = $objectManager
             ->get('\Magento\Integration\Api\OauthServiceInterface');
+        $configResource = $objectManager
+            ->get('\Magento\Config\Model\ResourceModel\Config\Data');
+        $collectionFactory = $objectManager
+            ->get('\Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory');
+
+        //remove config settings if any
+        $collections = $collectionFactory->create()
+            ->addPathFilter('sample_news');
+        foreach ($collections as $config) {
+            $configResource->delete($config);
+        }
+        //
         $baseUrl = $storeManager->getStore()->getBaseUrl();
 
         $integration = $integrationFactory->create()->load('Kangaroorewards', 'name');
