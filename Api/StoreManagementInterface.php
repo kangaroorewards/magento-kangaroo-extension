@@ -12,10 +12,9 @@ namespace Kangaroorewards\Core\Api;
 interface StoreManagementInterface
 {
     /**
-     * Return all store address Info.
+     * Get store address, country info
      *
-     * @api
-     * @return string store address info
+     * @return array
      */
     public function getStoreAddressInfo();
 }

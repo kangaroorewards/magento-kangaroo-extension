@@ -22,17 +22,22 @@ class Uninstall implements UninstallInterface
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeManager = $objectManager
             ->get('\Magento\Store\Model\StoreManagerInterface');
-        $integrationFactory = $objectManager
-            ->get('\Magento\Integration\Model\IntegrationFactory');
+//        $integrationFactory = $objectManager
+//            ->get('\Magento\Integration\Model\IntegrationFactory');
+        $credentialFactory = $objectManager
+            ->get('\Kangaroorewards\Core\Model\KangarooCredentialFactory');
         $oauthService = $objectManager
             ->get('\Magento\Integration\Api\OauthServiceInterface');
+        $log = $objectManager
+            ->get('\Psr\Log\LoggerInterface');
         $baseUrl = $storeManager->getStore()->getBaseUrl();
 
-        $integration = $integrationFactory->create()->load('Kangaroorewards', 'name');
-        $consumer = $oauthService->loadConsumer($integration->getConsumerId());
-        $key = $consumer->getSecret();
 
-        $request = new KangarooRewardsRequest($key);
+//        $integration = $integrationFactory->create()->load('Kangaroorewards', 'name');
+//        $consumer = $oauthService->loadConsumer($integration->getConsumerId());
+//        $key = $consumer->getSecret();
+
+        $request = new KangarooRewardsRequest($credentialFactory, $log);
         $data = array("domain" => $baseUrl);
         $sendData = json_encode($data);
         $request->post('magento/unInstall', array("data" => $sendData));
@@ -47,5 +52,9 @@ class Uninstall implements UninstallInterface
                 $oauthService->deleteConsumer($integrationData[Info::DATA_CONSUMER_ID]);
             }
         }
+        $setup->startSetup();
+        $connection = $setup->getConnection();
+        $connection->dropTable($connection->getTableName('kangaroorewards_credential'));
+        $setup->endSetup();
     }
 }

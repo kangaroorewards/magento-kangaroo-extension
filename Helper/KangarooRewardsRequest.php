@@ -4,6 +4,7 @@
  */
 namespace Kangaroorewards\Core\Helper;
 use OAuth\Common\Http\Uri\Uri;
+use Kangaroorewards\Core\Model\KangarooCredentialFactory;
 
 /**
  * Class KangarooRewardsRequest
@@ -17,13 +18,26 @@ class KangarooRewardsRequest
     private $_timeout = 30;
 
     /**
-     * KangarooRewardsRequest constructor.
-     *
-     * @param string $key
+     * @var KangarooCredentialFactory
      */
-    public function __construct($key = '')
+    protected $credentialFactory;
+
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * KangarooRewardsRequest constructor.
+     * @param KangarooCredentialFactory $credentialFactory
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(
+        KangarooCredentialFactory $credentialFactory,
+        \Psr\Log\LoggerInterface $logger)
     {
-        $this->_token = $key;
+        $this->credentialFactory = $credentialFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -33,10 +47,12 @@ class KangarooRewardsRequest
      */
     public function post($path, $data = array())
     {
+        $token = $this->getKangarooAccessToken();
         return $this->_request(
             \Zend\Http\Request::METHOD_POST,
             $path,
-            $data
+            $data,
+            $token
         );
     }
 
@@ -44,14 +60,18 @@ class KangarooRewardsRequest
      * @param $method
      * @param $path
      * @param $data
-     * @return mixed
+     * @param string $key
+     * @return \Zend\Http\Response
      */
-    private function _request($method, $path, $data)
+    private function _request($method, $path, $data, $key = '')
     {
         $uriPath = self::getKangarooAPIUrl() . '/' . $path;
         $uri = new Uri($uriPath);
 
         $request = new \Zend\Http\Request();
+
+        /*
+         * This is for the first version signature
         if ($this->_token != '') {
             $httpHeaders = new \Zend\Http\Headers();
             $httpHeaders->addHeaders(
@@ -63,11 +83,23 @@ class KangarooRewardsRequest
             );
             $request->setHeaders($httpHeaders);
         }
+        */
+        if ($key != '') {
+            $httpHeaders = new \Zend\Http\Headers();
+            $httpHeaders->addHeaders(
+                [
+                    'Authorization' => $key
+                ]
+            );
+            $request->setHeaders($httpHeaders);
+        }
+
         $request->setUri($uriPath);
         $request->setMethod($method);
 
+
         $params = new \Zend\Stdlib\Parameters($data);
-        $request->setQuery($params);
+        $request->setPost($params);
 
         $client = new \Zend\Http\Client();
         $options = [
@@ -149,4 +181,58 @@ class KangarooRewardsRequest
         $url = rtrim(self::$_baseUri, '/');
         return $url;
     }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getKangarooAccessToken()
+    {
+        $existingCredential = $this->credentialFactory->create()->load(1);
+        $item = $existingCredential->getData();
+        if (isset($item)) {
+            try {
+                if (isset($item['access_token']) && $item['access_token'] != '') {
+                    if ($item['updated_at'] + $item['expires_in'] > time()) {
+                        return $item['access_token'];
+                    }
+                }
+
+                return $this->getAccessToken($existingCredential);
+
+            } catch (\Exception $e) {
+                throw new \Exception('Get access token fail!');
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param $credential
+     * @return string
+     */
+    private function getAccessToken($credential)
+    {
+        $item = $credential->getData();
+        $sendData = [
+            'grant_type' => 'client_credentials',
+            'client_id' => $item['client_id'],
+            'client_secret' => $item['client_secret'],
+            'scope' => $item['scope'],
+        ];
+
+        $response = $this->_request(\Zend\Http\Request::METHOD_POST, 'oauth/token', $sendData);
+        $this->logger->info('[KangarooRewards]-UpdateAccessToken: ' . $response);
+        if ($response->isSuccess()) {
+            $object = json_decode($response->getBody());
+            if (isset($object->access_token)) {
+                $credential->setAccessToken($object->access_token);
+                $credential->setExpiresIn($object->expires_in);
+                $credential->save();
+                return $object->access_token;
+            }
+        }
+        return '';
+    }
+
 }
