@@ -125,19 +125,20 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                 return (object)["code" => $product->getSku(),
                     "product" => $productL];
             } else {
+                $parentId = $this->registry->registry('current_product')->getId();
                 return (object)["code" => $product->getSku(),
-                    "product" => $this->getChildren()];
+                    "product" => $this->getChildren($parentId)];
             }
         }
         return null;
     }
 
     /**
+     * @param int $parentId
      * @return array
      */
-    public function getChildren()
+    public function getChildren($parentId)
     {
-        $parentId = $this->registry->registry('current_product')->getId();
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter('type_id', 'configurable')
             ->addFilter('entity_id', $parentId)

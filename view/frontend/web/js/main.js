@@ -89,14 +89,14 @@ define(
                                         id: localData['kangaroo-customer']['customer']['id'],
                                         email: localData['kangaroo-customer']['customer']['email']
                                     };
-                                    $.getScript(config.kangarooAPIUrl + "/magento/initJS");
+                                    $.getScript(config.kangarooAPIUrl + "/magento/initJS?domain="+encodeURI(config.baseStoreUrl));
                                 }
                             }
                         }
                     }
                 }
             );
-            $.getScript(config.kangarooAPIUrl + "/magento/initJS");
+            $.getScript(config.kangarooAPIUrl + "/magento/initJS?domain="+encodeURI(config.baseStoreUrl));
 
         }
     }

@@ -6,4 +6,6 @@
                 type="Kangaroorewards\Core\Model\KangarooCredential" />
     <preference for="Kangaroorewards\Core\Api\KangarooCredentialRepositoryInterface"
             type="Kangaroorewards\Core\Model\KangarooCredentialRepository" />
+    <preference for="Kangaroorewards\Core\Api\KangarooEndpointInterface"
+                type="Kangaroorewards\Core\Model\KangarooEndpoint" />
 </config>

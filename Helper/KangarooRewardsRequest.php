@@ -55,6 +55,21 @@ class KangarooRewardsRequest
             $token
         );
     }
+    /**
+     * @param $path
+     * @param array $data
+     * @return mixed
+     */
+    public function get($path, $data = array())
+    {
+        $token = $this->getKangarooAccessToken();
+        return $this->_request(
+            \Zend\Http\Request::METHOD_GET,
+            $path,
+            $data,
+            $token
+        );
+    }
 
     /**
      * @param $method
@@ -99,7 +114,12 @@ class KangarooRewardsRequest
 
 
         $params = new \Zend\Stdlib\Parameters($data);
-        $request->setPost($params);
+        if($method == \Zend\Http\Request::METHOD_POST) {
+            $request->setPost($params);
+        }
+        elseif($method == \Zend\Http\Request::METHOD_GET) {
+            $request->setQuery($params);
+        }
 
         $client = new \Zend\Http\Client();
         $options = [

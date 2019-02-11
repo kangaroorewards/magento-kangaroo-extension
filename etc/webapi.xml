@@ -14,4 +14,61 @@
             <resource ref="Magento_Backend::admin"/>
         </resources>
     </route>
+
+
+
+    <route url="/V1/kangaroo/translation" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="translation"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/transaction" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="transaction"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/balance" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="balance"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/saveSetting" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="saveSetting"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/redeem" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="redeem"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/welcomeMessage" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="welcomeMessage"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/redeemCatalog" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="redeemCatalog"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/getProductOffer" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getProductOffer"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/kangaroo/getShoppingCartItemPrice" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getShoppingCartItemPrice"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
