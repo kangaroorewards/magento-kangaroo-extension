@@ -124,7 +124,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if($response->isSuccess()){
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -151,7 +151,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -174,7 +174,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if($response->isSuccess()){
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -201,7 +201,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -228,7 +228,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -245,7 +245,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if($response->isSuccess()){
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -270,7 +270,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -310,7 +310,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -351,7 +351,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         if ($response->isSuccess()) {
             return $response->getBody();
         }
-        return '';     
+        return json_encode(["active" => false]);
     }
 
     /**

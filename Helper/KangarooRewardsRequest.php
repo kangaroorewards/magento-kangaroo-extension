@@ -221,7 +221,8 @@ class KangarooRewardsRequest
                 return $this->getAccessToken($existingCredential);
 
             } catch (\Exception $e) {
-                throw new \Exception('Get access token fail!');
+                $this->logger->info('[KangarooRewards] - Can not get access token');
+                return '';
             }
         }
         return '';
