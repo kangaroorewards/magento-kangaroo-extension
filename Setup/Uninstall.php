@@ -22,8 +22,8 @@ class Uninstall implements UninstallInterface
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeManager = $objectManager
             ->get('\Magento\Store\Model\StoreManagerInterface');
-//        $integrationFactory = $objectManager
-//            ->get('\Magento\Integration\Model\IntegrationFactory');
+        $integrationFactory = $objectManager
+            ->get('\Magento\Integration\Model\IntegrationFactory');
         $credentialFactory = $objectManager
             ->get('\Kangaroorewards\Core\Model\KangarooCredentialFactory');
         $oauthService = $objectManager
@@ -33,15 +33,9 @@ class Uninstall implements UninstallInterface
         $baseUrl = $storeManager->getStore()->getBaseUrl();
 
 
-//        $integration = $integrationFactory->create()->load('Kangaroorewards', 'name');
+        $integration = $integrationFactory->create()->load('Kangaroorewards', 'name');
 //        $consumer = $oauthService->loadConsumer($integration->getConsumerId());
 //        $key = $consumer->getSecret();
-
-        $request = new KangarooRewardsRequest($credentialFactory, $log);
-        $data = array("domain" => $baseUrl);
-        $sendData = json_encode($data);
-        $request->post('magento/unInstall', array("data" => $sendData));
-
         $integrationService = $objectManager
             ->get('\Magento\Integration\Api\IntegrationServiceInterface');
 
@@ -57,6 +51,10 @@ class Uninstall implements UninstallInterface
         $tableName = $setup->getTable('kangaroorewards_credential');
         // Check if the table already exists
         if ($setup->getConnection()->isTableExists($tableName)) {
+            $request = new KangarooRewardsRequest($credentialFactory, $log);
+            $data = array("domain" => $baseUrl);
+            $sendData = json_encode($data);
+            $request->post('magento/unInstall', array("data" => $sendData));
             $connection->dropTable($tableName);
         }
         $setup->endSetup();
