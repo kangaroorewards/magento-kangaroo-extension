@@ -54,7 +54,11 @@ class Uninstall implements UninstallInterface
         }
         $setup->startSetup();
         $connection = $setup->getConnection();
-        $connection->dropTable($connection->getTableName('kangaroorewards_credential'));
+        $tableName = $setup->getTable('kangaroorewards_credential');
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName)) {
+            $connection->dropTable($tableName);
+        }
         $setup->endSetup();
     }
 }
