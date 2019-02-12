@@ -234,7 +234,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
     /**
      * @return string
      */
-    public function welcomeMessage()
+    public function welcomeMessage2()
     {
         $data = [
             'storeId' => $this->kangarooData->getStoreId(),
@@ -376,5 +376,43 @@ class KangarooEndpoint implements KangarooEndpointInterface
             return (object)["code" => $product->getSku(),
                 "product" => $this->kangarooData->getChildren($parentId)];
         }
+    }
+    
+    public function welcomeMessage()
+    {
+        $data = [
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        $response = $this->test('magento/welcomeMessage',$data);//$this->request->get('magento/welcomeMessage', $data);
+        if($response!=''){
+            return $response;
+        }
+        return json_encode(["active" => false]);
+    }
+    
+    private function test($url,$data)
+    {
+        //standard form data
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://integ-api-dev.traktrok.com'.$url); //absolute url
+        curl_setopt($ch, CURLOPT_HEADER, true); // No header in the result
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return, do not echo result
+        curl_setopt($ch, CURLOPT_POST, 1); // This is a POST request
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data); // Data to POST
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+        // Fetch and return content
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            return '';
+        }
+
+
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $body = substr($response, $header_size);
+        curl_close($ch);
+        return $body;
     }
 }
