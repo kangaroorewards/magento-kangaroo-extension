@@ -305,10 +305,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             $data['product'] = ['id' => $product->code,
                 'product' => $productDetail];
-        }
-        $response = $this->request->get('magento/getProductOffer', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+
+            $response = $this->request->get('magento/getProductOffer', $data);
+            if ($response->isSuccess()) {
+                return $response->getBody();
+            }
         }
         return json_encode(["active" => false]);
     }
@@ -339,6 +340,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 foreach ($cart->cartItems as $item) {
                     $productList[] = [
                         'code' => $item["code"],
+                        'parent_id' => $item["parentId"],
                         'variant_id' => $item["productId"],
                         'price' => $item["price"],
                         'quantity' => $item["quantity"]
@@ -361,8 +363,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     private function getProductBySKU($sku){
         $product = $this->productRepository->get($sku);
-        if ($product->getTypeId() == 'simple') {
+        if ($product->getTypeId() == 'simple' ||
+            $product->getTypeId() == 'virtual' ||
+            $product->getTypeId() == 'downloadable') {
             $productOne = array("code" => $product->getSku(),
+                "parentId" => $product->getId(),
                 "productId" => $product->getId(),
                 "price" => $product->getPrice(),
                 "title" => $product->getName()
@@ -371,10 +376,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             return (object)["code" => $product->getSku(),
                 "product" => $productL];
-        } else {
+        } else if ($product->getTypeId() == 'configurable'){
             $parentId = $product->getId();
             return (object)["code" => $product->getSku(),
                 "product" => $this->kangarooData->getChildren($parentId)];
         }
+        return null;
     }
 }

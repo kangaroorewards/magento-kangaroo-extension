@@ -114,8 +114,11 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
         if($this->isProductPage()) {
             $product = $this->registry->registry('current_product');
 
-            if ($product->getTypeId() == 'simple') {
+            if ($product->getTypeId() == 'simple' ||
+                $product->getTypeId() == 'virtual' ||
+                $product->getTypeId() == 'downloadable') {
                 $productOne = array("code" => $product->getSku(),
+                    "parentId" => $product->getId(),
                     "productId" => $product->getId(),
                     "price" => $product->getPrice(),
                     "title" => $product->getName()
@@ -124,7 +127,7 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
 
                 return (object)["code" => $product->getSku(),
                     "product" => $productL];
-            } else {
+            } elseif ($product->getTypeId() == 'configurable'){
                 $parentId = $this->registry->registry('current_product')->getId();
                 return (object)["code" => $product->getSku(),
                     "product" => $this->getChildren($parentId)];
@@ -153,6 +156,7 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
             foreach ($children as $child) {
                 $childProducts[] = array(
                     "code" => $child->getSku(),
+                    "parentId" => $parentId,
                     "productId" => $child->getId(),
                     "price" => $child->getPrice(),
                     "title" => $child->getName()
@@ -204,14 +208,20 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
             $cartItems = [];
             foreach ($items as $item) {
                 $parent = $item->getParentItem();
-                if ($item->getProductType() == 'simple') {
+                if ($item->getProductType() != 'configurable'&&
+                    $item->getProductType() != 'bundle') {
+                    $price = $item->getPrice();
+                    if(isset($parent) && $parent->getProductType() == 'configurable')
+                    {
+                        $price = $parent->getPrice();
+                    }
                     $cartItems[] = array(
                         'code' => $item->getSku(),
+                        'parentId' => isset($parent) ?
+                            $parent->getProductId():$item->getProductId(),
                         'productId' => $item->getProductId(),
-                        'price' => isset($parent) ?
-                            $parent->getPrice() : $item->getPrice(),
-                        'quantity' => isset($parent) ?
-                            $parent->getQty() : $item->getQty()
+                        'price' => $price,
+                        'quantity' => $item->getQty()
                     );
                 }
             }

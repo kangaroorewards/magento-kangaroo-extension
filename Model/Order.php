@@ -53,14 +53,22 @@ class Order
 
         foreach ($orderItems as $orderProduct) {
             $parent = $orderProduct->getParentItem();
-            if ($orderProduct->getProductType() == 'simple') {
+            if ($orderProduct->getProductType() != 'configurable' &&
+                $orderProduct->getProductType() != 'bundle'
+            ) {
+                $price = $orderProduct->getPrice();
+                if(isset($parent) && $parent->getProductType() == 'configurable')
+                {
+                    $price = $parent->getPrice();
+                }
                 $data['order']['orderItems'][] = array(
                     'code' => $orderProduct->getSku(),
+                    'parentId' => isset($parent) ?
+                        $parent->getProductId():
+                        $orderProduct->getProductId(),
                     'productId' => $orderProduct->getProductId(),
                     'title' => $orderProduct->getName(),
-                    'price' => isset($parent) ?
-                        $parent->getPrice() :
-                        $orderProduct->getPrice(),
+                    'price'=>$price,
                     'qtyOrdered' => $orderProduct->getQtyOrdered()
                 );
             }

@@ -19,24 +19,26 @@ define(
 
             if (config.isProductPage) {
                 var product = config.currentProduct;
-                product['product'].forEach(
-                    function (item) {
+                if(product != null) {
+                    product['product'].forEach(
+                        function (item) {
 
-                        var productD = {
-                            code: item["code"],
-                            productId: item["productId"],
-                            price: item["price"],
-                            title: item["title"]
-                        };
-                        productDetails.push(productD);
+                            var productD = {
+                                code: item["code"],
+                                parentId: item['parentId'],
+                                productId: item["productId"],
+                                price: item["price"],
+                                title: item["title"]
+                            };
+                            productDetails.push(productD);
+                        }
+                    );
+
+                    KangarooApps.Loyalties.product = {
+                        id: product['code'],
+                        product: productDetails
                     }
-                );
-
-                KangarooApps.Loyalties.product = {
-                    id: product['code'],
-                    product: productDetails
                 }
-
             }
 
             if (config.isCartExist) {
@@ -46,6 +48,7 @@ define(
                     function (item) {
                         var productItem = {
                             code: item["code"],
+                            parent_id: item["parentId"],
                             variant_id: item["productId"],
                             price: item["price"],
                             quantity: item["quantity"]
