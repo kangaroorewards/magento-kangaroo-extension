@@ -71,7 +71,7 @@ define(
             var localData = localStorage.getItem('mage-cache-storage');
             if (localData !== undefined) {
                 localData = JSON.parse(localData);
-                if (localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
+                if (localData != null && localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
                     KangarooApps.Loyalties.customer = {
                         id: localData['kangaroo-customer']['customer']['id'],
                         email: localData['kangaroo-customer']['customer']['email']
@@ -87,7 +87,7 @@ define(
                         if (localData !== undefined) {
                             localData = JSON.parse(localData);
                             if (localData !== undefined) {
-                                if (localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
+                                if (localData != null && localData['kangaroo-customer'] !== undefined && localData['kangaroo-customer']['customer']['id'] != null) {
                                     KangarooApps.Loyalties.customer = {
                                         id: localData['kangaroo-customer']['customer']['id'],
                                         email: localData['kangaroo-customer']['customer']['email']
