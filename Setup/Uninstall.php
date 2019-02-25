@@ -53,8 +53,7 @@ class Uninstall implements UninstallInterface
         if ($setup->getConnection()->isTableExists($tableName)) {
             $request = new KangarooRewardsRequest($credentialFactory, $log);
             $data = array("domain" => $baseUrl);
-            $sendData = json_encode($data);
-            $request->post('magento/unInstall', array("data" => $sendData));
+            $request->post('magento/unInstall', $data);
             $connection->dropTable($tableName);
         }
         $setup->endSetup();
