@@ -298,6 +298,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 $productDetail[] = [
                     'code' => $item["code"],
                     'productId' => $item["productId"],
+                    'parentId' => $item['parentId'],
                     'price' => $item["price"],
                     'title' => $item["title"]
                 ];
@@ -340,7 +341,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 foreach ($cart->cartItems as $item) {
                     $productList[] = [
                         'code' => $item["code"],
-                        'parent_id' => $item["parentId"],
+                        'parentId' => $item["parentId"],
                         'variant_id' => $item["productId"],
                         'price' => $item["price"],
                         'quantity' => $item["quantity"]
