@@ -37,10 +37,9 @@ interface KangarooEndpointInterface
 
     /**
      * @param float $redeemAmount
-     * @param float $subtotalAmount
      * @return string
      */
-    public function redeem($redeemAmount, $subtotalAmount);
+    public function redeem($redeemAmount);
 
     /**
      * @return string

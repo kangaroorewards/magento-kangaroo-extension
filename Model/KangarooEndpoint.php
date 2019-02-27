@@ -206,14 +206,12 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     /**
      * @param float $redeemAmount
-     * @param float $subtotalAmount
      * @return string
      */
-    public function redeem($redeemAmount, $subtotalAmount)
+    public function redeem($redeemAmount)
     {
         $data = [
             'redeemAmount' => $redeemAmount,
-            'subtotalAmount' => $subtotalAmount,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
@@ -222,6 +220,14 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $customer = $this->_getCustomer();
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
+        }
+
+        if($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                $data['cart'] = $cart->id;
+                $data['subtotalAmount'] = $cart->subtotal;
+            }
         }
 
         $response = $this->request->get('magento/redeem', $data);
@@ -264,6 +270,13 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $customer = $this->_getCustomer();
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
+        }
+
+        if($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                $data['cart'] = $cart->id;
+            }
         }
 
         $response = $this->request->get('magento/redeemCatalog', $data);
@@ -336,7 +349,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             if ($cart) {
                 $data['discount'] = $cart->discount;
                 $data['subtotal'] = $cart->subtotal;
-
+                $data['cart'] = $cart->id;
                 $productList = [];
                 foreach ($cart->cartItems as $item) {
                     $productList[] = [
