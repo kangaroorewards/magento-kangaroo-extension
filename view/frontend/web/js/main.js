@@ -48,7 +48,7 @@ define(
                     function (item) {
                         var productItem = {
                             code: item["code"],
-                            parent_id: item["parentId"],
+                            parentId: item["parentId"],
                             variant_id: item["productId"],
                             price: item["price"],
                             quantity: item["quantity"]

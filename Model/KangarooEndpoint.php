@@ -206,14 +206,12 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     /**
      * @param float $redeemAmount
-     * @param float $subtotalAmount
      * @return string
      */
-    public function redeem($redeemAmount, $subtotalAmount)
+    public function redeem($redeemAmount)
     {
         $data = [
             'redeemAmount' => $redeemAmount,
-            'subtotalAmount' => $subtotalAmount,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
@@ -222,6 +220,14 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $customer = $this->_getCustomer();
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
+        }
+
+        if($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                $data['cart'] = $cart->id;
+                $data['subtotalAmount'] = $cart->subtotal;
+            }
         }
 
         $response = $this->request->get('magento/redeem', $data);
@@ -266,6 +272,13 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
+        if($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                $data['cart'] = $cart->id;
+            }
+        }
+
         $response = $this->request->get('magento/redeemCatalog', $data);
         if ($response->isSuccess()) {
             return $response->getBody();
@@ -298,6 +311,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 $productDetail[] = [
                     'code' => $item["code"],
                     'productId' => $item["productId"],
+                    'parentId' => $item['parentId'],
                     'price' => $item["price"],
                     'title' => $item["title"]
                 ];
@@ -335,12 +349,12 @@ class KangarooEndpoint implements KangarooEndpointInterface
             if ($cart) {
                 $data['discount'] = $cart->discount;
                 $data['subtotal'] = $cart->subtotal;
-
+                $data['cart'] = $cart->id;
                 $productList = [];
                 foreach ($cart->cartItems as $item) {
                     $productList[] = [
                         'code' => $item["code"],
-                        'parent_id' => $item["parentId"],
+                        'parentId' => $item["parentId"],
                         'variant_id' => $item["productId"],
                         'price' => $item["price"],
                         'quantity' => $item["quantity"]

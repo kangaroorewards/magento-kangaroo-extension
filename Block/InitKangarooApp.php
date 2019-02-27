@@ -211,9 +211,11 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                 if ($item->getProductType() != 'configurable'&&
                     $item->getProductType() != 'bundle') {
                     $price = $item->getPrice();
+                    $quantity = $item->getQty();
                     if(isset($parent) && $parent->getProductType() == 'configurable')
                     {
                         $price = $parent->getPrice();
+                        $quantity = $parent->getQty();
                     }
                     $cartItems[] = array(
                         'code' => $item->getSku(),
@@ -221,7 +223,7 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                             $parent->getProductId():$item->getProductId(),
                         'productId' => $item->getProductId(),
                         'price' => $price,
-                        'quantity' => $item->getQty()
+                        'quantity' => $quantity
                     );
                 }
             }
