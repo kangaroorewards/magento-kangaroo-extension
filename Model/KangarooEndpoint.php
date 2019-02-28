@@ -313,7 +313,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
                     'productId' => $item["productId"],
                     'parentId' => $item['parentId'],
                     'price' => $item["price"],
-                    'title' => $item["title"]
+                    'title' => $item["title"],
+                    'categories' => $item["categories"]
                 ];
             }
 
@@ -357,7 +358,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
                         'parentId' => $item["parentId"],
                         'variant_id' => $item["productId"],
                         'price' => $item["price"],
-                        'quantity' => $item["quantity"]
+                        'quantity' => $item["quantity"],
+                        'categories' => $item["categories"],
                     ];
                 }
                 $data['productList'] = $productList;
@@ -384,7 +386,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 "parentId" => $product->getId(),
                 "productId" => $product->getId(),
                 "price" => $product->getPrice(),
-                "title" => $product->getName()
+                "title" => $product->getName(),
+                'categories' => $product->getCategoryIds()
             );
             $productL[] = $productOne;
 
