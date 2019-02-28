@@ -28,7 +28,8 @@ define(
                                 parentId: item['parentId'],
                                 productId: item["productId"],
                                 price: item["price"],
-                                title: item["title"]
+                                title: item["title"],
+                                categories: item["categories"]
                             };
                             productDetails.push(productD);
                         }
@@ -51,7 +52,8 @@ define(
                             parentId: item["parentId"],
                             variant_id: item["productId"],
                             price: item["price"],
-                            quantity: item["quantity"]
+                            quantity: item["quantity"],
+                            categories: item["categories"]
                         };
                         productList.push(productItem);
                     }

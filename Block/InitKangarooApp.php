@@ -121,7 +121,8 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                     "parentId" => $product->getId(),
                     "productId" => $product->getId(),
                     "price" => $product->getPrice(),
-                    "title" => $product->getName()
+                    "title" => $product->getName(),
+                    "categories" => $product->getCategoryIds()
                 );
                 $productL[] = $productOne;
 
@@ -159,7 +160,8 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                     "parentId" => $parentId,
                     "productId" => $child->getId(),
                     "price" => $child->getPrice(),
-                    "title" => $child->getName()
+                    "title" => $child->getName(),
+                    "categories" => $child->getCategoryIds()
                 );
             }
         }
@@ -217,13 +219,15 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                         $price = $parent->getPrice();
                         $quantity = $parent->getQty();
                     }
+                    $product = $this->productRepository->get($item->getSku());
                     $cartItems[] = array(
                         'code' => $item->getSku(),
                         'parentId' => isset($parent) ?
                             $parent->getProductId():$item->getProductId(),
                         'productId' => $item->getProductId(),
                         'price' => $price,
-                        'quantity' => $quantity
+                        'quantity' => $quantity,
+                        'categories' => $product->getCategoryIds()
                     );
                 }
             }

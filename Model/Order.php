@@ -13,14 +13,16 @@ class Order
 {
     private $_order;
 
+    private $_productFactory;
     /**
      * Order constructor.
      *
      * @param $order
      */
-    public function __construct($order)
+    public function __construct($order, $productFactory)
     {
         $this->_order = $order;
+        $this->_productFactory = $productFactory;
     }
 
 
@@ -61,6 +63,7 @@ class Order
                 {
                     $price = $parent->getPrice();
                 }
+                $product = $this->_productFactory->create()->load($orderProduct->getProductId());
                 $data['order']['orderItems'][] = array(
                     'code' => $orderProduct->getSku(),
                     'parentId' => isset($parent) ?
@@ -69,7 +72,8 @@ class Order
                     'productId' => $orderProduct->getProductId(),
                     'title' => $orderProduct->getName(),
                     'price'=>$price,
-                    'qtyOrdered' => $orderProduct->getQtyOrdered()
+                    'qtyOrdered' => $orderProduct->getQtyOrdered(),
+                    'categories' => $product->getCategoryIds()
                 );
             }
         }
