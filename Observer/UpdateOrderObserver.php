@@ -38,23 +38,33 @@ class UpdateOrderObserver implements ObserverInterface
      * @var KangarooCredentialFactory 
      */
     protected $credentialFactory;
+
+    /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
+    protected $productFactory;
+
     /**
      * UpdateOrderObserver constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
-     * @param IntegrationFactory       $integrationFactory
-     * @param OauthServiceInterface    $oauthService
+     * @param IntegrationFactory $integrationFactory
+     * @param OauthServiceInterface $oauthService
+     * @param \Magento\Catalog\Model\ProductFactory $productFactory
+     * @param KangarooCredentialFactory $credentialFactory
      */
     public function __construct(
         \Psr\Log\LoggerInterface $logger,
         IntegrationFactory $integrationFactory,
         OauthServiceInterface $oauthService,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
         KangarooCredentialFactory $credentialFactory
     ) {
         $this->_logger = $logger;
         $this->integrationFactory = $integrationFactory;
         $this->oauthService = $oauthService;
         $this->credentialFactory = $credentialFactory;
+        $this->productFactory = $productFactory;
     }
 
     /**
@@ -62,7 +72,7 @@ class UpdateOrderObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $order = new Order($observer->getEvent()->getOrder());
+        $order = new Order($observer->getEvent()->getOrder(), $this->productFactory);
         if ($order) {
             $data = array(
                 'user_agent' => $_SERVER['HTTP_USER_AGENT']
