@@ -71,4 +71,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/kangaroo/getShoppingCartSubtotal" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getShoppingCartSubtotal"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

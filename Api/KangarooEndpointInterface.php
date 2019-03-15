@@ -62,5 +62,10 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function getShoppingCartItemPrice();
+
+    /**
+     * @return string
+     */
+    public function getShoppingCartSubtotal();
     
 }
