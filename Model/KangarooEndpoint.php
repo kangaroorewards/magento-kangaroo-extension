@@ -400,4 +400,19 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
         return null;
     }
+
+    /**
+     * @return string
+     */
+    public function getShoppingCartSubtotal()
+    {
+        $subtotal = 0;
+        if($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                $subtotal = $cart->subtotal;
+            }
+        }
+        return json_encode(["subtotal" => $subtotal]);
+    }
 }
