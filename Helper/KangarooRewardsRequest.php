@@ -15,7 +15,7 @@ class KangarooRewardsRequest
 {
     private $_token;
     private static $_baseUri = 'https://integ-api-dev.traktrok.com/';
-    private $_timeout = 30;
+    private $_timeout = 240;
 
     /**
      * @var KangarooCredentialFactory
