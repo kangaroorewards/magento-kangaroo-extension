@@ -14,7 +14,7 @@ class Collection extends AbstractCollection
     /**
      * Collection constructor.
      */
-    protected function __construct()
+    public function __construct()
     {
         $this->_init('Kangaroorewards\Core\Model\KangarooCredential',
             'Kangaroorewards\Core\Model\ResourceModel\KangarooCredential');
