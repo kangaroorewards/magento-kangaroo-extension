@@ -74,11 +74,7 @@ class UpdateOrderObserver implements ObserverInterface
     {
         $order = new Order($observer->getEvent()->getOrder(), $this->productFactory);
         if ($order) {
-            $data = array(
-                'user_agent' => $_SERVER['HTTP_USER_AGENT']
-            );
-
-            $data = array_merge($data, $order->getOrderData());
+            $data = $order->getOrderData();
 //            $integration = $this->integrationFactory
 //                ->create()
 //                ->load('Kangaroorewards', 'name');
