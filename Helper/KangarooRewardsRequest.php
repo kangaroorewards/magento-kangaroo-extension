@@ -243,7 +243,7 @@ class KangarooRewardsRequest
         ];
 
         $response = $this->_request(\Zend\Http\Request::METHOD_POST, 'oauth/token', $sendData);
-        $this->logger->info('[KangarooRewards]-UpdateAccessToken: ' . $response);
+//        $this->logger->info('[KangarooRewards]-UpdateAccessToken: ' . $response);
         if ($response->isSuccess()) {
             $object = json_decode($response->getBody());
             if (isset($object->access_token)) {

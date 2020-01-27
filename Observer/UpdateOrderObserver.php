@@ -35,7 +35,7 @@ class UpdateOrderObserver implements ObserverInterface
     protected $oauthService;
 
     /**
-     * @var KangarooCredentialFactory 
+     * @var KangarooCredentialFactory
      */
     protected $credentialFactory;
 
@@ -72,19 +72,21 @@ class UpdateOrderObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $order = new Order($observer->getEvent()->getOrder(), $this->productFactory);
-        if ($order) {
-            $data = $order->getOrderData();
-//            $integration = $this->integrationFactory
-//                ->create()
-//                ->load('Kangaroorewards', 'name');
-//            $consumer = $this->oauthService
-//                ->loadConsumer($integration->getConsumerId());
-//            $key = $consumer->getSecret();
-            $request = new KangarooRewardsRequest($this->credentialFactory, $this->_logger);
-            $sendData = json_encode($data);
-            $request->post('magento/order', array("data" => $sendData));
-            $this->_logger->info("[Kangaroo Rewards]" . $sendData);
+        try {
+            $order = new Order($observer->getEvent()->getOrder(), $this->productFactory);
+            if ($order) {
+                $data = $order->getOrderData();
+                $request = new KangarooRewardsRequest($this->credentialFactory, $this->_logger);
+                $sendData = json_encode($data);
+                $request->post('magento/order', array("data" => $sendData));
+                $this->_logger->info("[Kangaroo Rewards]" . $sendData);
+            }
+        } catch (\Exception $e) {
+            $this->_logger->error("[Kangaroo Rewards] Order observer",
+                [
+                    'error' => $e,
+                    'order' => isset($data) ? $data : null
+                ]);
         }
     }
 }
