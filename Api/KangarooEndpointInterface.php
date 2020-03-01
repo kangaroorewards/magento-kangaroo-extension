@@ -12,59 +12,59 @@ namespace Kangaroorewards\Core\Api;
 interface KangarooEndpointInterface
 {
     /**
-     * @return string
+     * @return array
      */
     public function translation();
 
     /**
      * @param int $limit
      * @param int $page
-     * @return string
+     * @return array
      */
     public function transaction($limit, $page);
 
     /**
-     * @return string
+     * @return array
      */
     public function balance();
 
     /**
      * @param int $allow_email
      * @param int $allow_sms
-     * @return string
+     * @return array
      */
     public function saveSetting($allow_email, $allow_sms);
 
     /**
      * @param float $redeemAmount
-     * @return string
+     * @return array
      */
     public function redeem($redeemAmount);
 
     /**
-     * @return string
+     * @return array
      */
     public function welcomeMessage();
     
     /**
      * @param int $punchItemId
-     * @return string
+     * @return array
      */
     public function redeemCatalog($punchItemId);
 
     /**
      * @param string $sku
-     * @return string
+     * @return array
      */
     public function getProductOffer($sku);
 
     /**
-     * @return string
+     * @return array
      */
     public function getShoppingCartItemPrice();
 
     /**
-     * @return string
+     * @return array
      */
     public function getShoppingCartSubtotal();
     

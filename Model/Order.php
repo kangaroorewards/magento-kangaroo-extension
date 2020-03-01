@@ -73,6 +73,8 @@ class Order
                     'title' => $orderProduct->getName(),
                     'price'=>$price,
                     'qtyOrdered' => $orderProduct->getQtyOrdered(),
+                    'qtyRefunded' => $orderProduct->getQtyRefunded(),
+                    'qtyCanceled' => $orderProduct->getQtyCanceled(),
                     'categories' => $product->getCategoryIds()
                 );
             }

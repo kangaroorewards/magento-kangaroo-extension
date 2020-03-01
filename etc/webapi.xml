@@ -59,13 +59,13 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
-    <route url="/V1/kangaroo/getProductOffer" method="GET">
+    <route url="/V1/kangaroo/getProductOffer" method="POST">
         <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getProductOffer"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
-    <route url="/V1/kangaroo/getShoppingCartItemPrice" method="GET">
+    <route url="/V1/kangaroo/getShoppingCartItemPrice" method="POST">
         <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getShoppingCartItemPrice"/>
         <resources>
             <resource ref="anonymous"/>
