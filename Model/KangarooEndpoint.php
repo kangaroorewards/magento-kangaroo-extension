@@ -112,7 +112,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         return $this->customer;
     }
     /**
-     * @return array
+     * @return string
      */
     public function translation()
     {
@@ -121,17 +121,16 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'domain' => $this->kangarooData->getBaseStoreUrl()
         ];
         $response = $this->request->get('magento/translation', $data);
-        if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+        if($response->isSuccess()){
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
      * @param int $limit
      * @param int $page
-     * @return array
+     * @return string
      */
     public function transaction($limit, $page)
     {
@@ -150,14 +149,13 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
         $response = $this->request->get('magento/transaction', $data);
         if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function balance()
     {
@@ -173,17 +171,16 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         $response = $this->request->get('magento/balance', $data);
-        if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+        if($response->isSuccess()){
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
      * @param int $allow_email
      * @param int $allow_sms
-     * @return array
+     * @return string
      */
     public function saveSetting($allow_email, $allow_sms)
     {
@@ -202,15 +199,14 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
         $response = $this->request->get('magento/saveSetting', $data);
         if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
      * @param float $redeemAmount
-     * @return array
+     * @return string
      */
     public function redeem($redeemAmount)
     {
@@ -226,7 +222,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if ($this->kangarooData->isShoppingCartExist()) {
+        if($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['cart'] = $cart->id;
@@ -236,14 +232,13 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
         $response = $this->request->get('magento/redeem', $data);
         if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function welcomeMessage()
     {
@@ -253,16 +248,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
         ];
 
         $response = $this->request->get('magento/welcomeMessage', $data);
-        if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+        if($response->isSuccess()){
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
      * @param int $punchItemId
-     * @return array
+     * @return string
      */
     public function redeemCatalog($punchItemId)
     {
@@ -278,7 +272,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if ($this->kangarooData->isShoppingCartExist()) {
+        if($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['cart'] = $cart->id;
@@ -287,15 +281,14 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
         $response = $this->request->get('magento/redeemCatalog', $data);
         if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
      * @param string $sku
-     * @return array|string
+     * @return string
      */
     public function getProductOffer($sku)
     {
@@ -311,7 +304,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         $product = $this->getProductBySKU($sku);
-        if ($product) {
+        if($product) {
             $data['productId'] = $product->code;
             $productDetail = [];
             foreach ($product->product as $item) {
@@ -330,14 +323,14 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             $response = $this->request->post('magento/getProductOffer', $data);
             if ($response->isSuccess()) {
-                return json_decode($response->getBody());
+                return $response->getBody();
             }
         }
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getShoppingCartItemPrice()
     {
@@ -352,7 +345,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if ($this->kangarooData->isShoppingCartExist()) {
+        if($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['discount'] = $cart->discount;
@@ -374,10 +367,9 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
         $response = $this->request->post('magento/getShoppingCartItemPrice', $data);
         if ($response->isSuccess()) {
-            return json_decode($response->getBody());
+            return $response->getBody();
         }
-
-        return ["active" => false];
+        return json_encode(["active" => false]);
     }
 
     /**
@@ -410,7 +402,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getShoppingCartSubtotal()
     {
@@ -421,6 +413,6 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 $subtotal = $cart->subtotal;
             }
         }
-        return ["subtotal" => $subtotal];
+        return json_encode(["subtotal" => $subtotal]);
     }
 }
