@@ -321,7 +321,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['product'] = ['id' => $product->code,
                 'product' => $productDetail];
 
-            $response = $this->request->get('magento/getProductOffer', $data);
+            $response = $this->request->post('magento/getProductOffer', $data);
             if ($response->isSuccess()) {
                 return $response->getBody();
             }
@@ -344,7 +344,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
         }
-        
+
         if($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
@@ -365,7 +365,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 $data['productList'] = $productList;
             }
         }
-        $response = $this->request->get('magento/getShoppingCartItemPrice', $data);
+        $response = $this->request->post('magento/getShoppingCartItemPrice', $data);
         if ($response->isSuccess()) {
             return $response->getBody();
         }

@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="<?php echo $block->getKangarooAPIUrl(); ?>/magento/initCss?storeId=<?php echo $block->getStoreId(); ?>&amp;domain=<?php echo  urlencode($block->getBaseStoreUrl()); ?>" type="text/css">
-<div class="kangaroo-container">
+<div class="kangaroo-container"  style="display: none;">
     <div class="wrapper">
         <div class="arrow arrow-top"></div>
         <div class="kangaroo-inner">
@@ -13,21 +13,21 @@
         <div class="arrow kangaroo-arrow"></div>
     </div>
 </div>
-<div class="kangaroo-widget">
+<div class="kangaroo-widget"  style="display: none;">
     <div class="kangaroo-wrapper">
         <div class="points">
             <span class="amount"></span>
         </div>
         <div class="name-box">
             <div class="arrow">
-                <span class="icon icon-up-arrow"></span>
+                <span class="icon icon-up-arrow" id="kangaroo-icon-program-name"></span>
             </div>
             <span class="name"></span>
         </div>
         <br style="clear:both">
     </div>
 </div>
-<div class="kangaroo-welcome-overlay">
+<div class="kangaroo-welcome-overlay"  style="display: none;">
     <div class="kangaroo-welcome-modal">
     </div>
 </div>

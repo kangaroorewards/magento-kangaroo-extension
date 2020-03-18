@@ -45,7 +45,7 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function welcomeMessage();
-    
+
     /**
      * @param int $punchItemId
      * @return string
