@@ -415,4 +415,31 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
         return json_encode(["subtotal" => $subtotal]);
     }
+
+    public function redeemOffer($qrcode)
+    {
+        $data = [
+            'qrcode' => $qrcode,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            $response = $this->request->get('magento/redeemOffer', $data);
+            if ($response->isSuccess()) {
+                return $response->getBody();
+            }
+        }
+
+        return json_encode(["active" => false]);
+    }
+
+    public function version()
+    {
+        return '1.1.0';
+    }
 }

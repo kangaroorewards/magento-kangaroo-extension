@@ -9,6 +9,7 @@ define(
             var productList = [];
             var productDetails = [];
             KangarooApps.Loyalties = KangarooApps.Loyalties || {};
+            KangarooApps.Loyalties.version = '1.1.0';
             KangarooApps.Loyalties.my_account_login = config.baseStoreUrl + "customer/account/login/";
             KangarooApps.Loyalties.my_account_register = config.baseStoreUrl + "customer/account/create/";
             KangarooApps.Loyalties.my_account_page = config.baseStoreUrl + "customer/account/login/";
