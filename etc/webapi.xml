@@ -77,4 +77,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/kangaroo/redeemOffer" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="redeemOffer"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

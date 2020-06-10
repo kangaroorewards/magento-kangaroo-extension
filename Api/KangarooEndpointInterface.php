@@ -67,5 +67,11 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function getShoppingCartSubtotal();
+
+    /**
+     * @param string $qrcode
+     * @return string
+     */
+    public function redeemOffer($qrcode);
     
 }
