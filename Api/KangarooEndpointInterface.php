@@ -73,5 +73,10 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function redeemOffer($qrcode);
+
+    /**
+     * @return string
+     */
+    public function version();
     
 }

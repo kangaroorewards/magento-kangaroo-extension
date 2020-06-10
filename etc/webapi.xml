@@ -83,4 +83,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/kangaroo/version" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="version"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

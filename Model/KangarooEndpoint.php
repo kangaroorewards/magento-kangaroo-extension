@@ -437,4 +437,9 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
         return json_encode(["active" => false]);
     }
+
+    public function version()
+    {
+        return '1.1.0';
+    }
 }
