@@ -49,6 +49,11 @@ class UpdateReviewObserver implements ObserverInterface
     protected $customerRepository;
 
     /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
+    protected $productFactory;
+
+    /**
      * UpdateOrderObserver constructor.
      *
      * @param \Psr\Log\LoggerInterface $logger
@@ -57,6 +62,7 @@ class UpdateReviewObserver implements ObserverInterface
      * @param KangarooCredentialFactory $credentialFactory
      * @param InitKangarooApp $kangarooData
      * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \Magento\Catalog\Model\ProductFactory $productFactory
      *
      */
     public function __construct(
@@ -65,7 +71,8 @@ class UpdateReviewObserver implements ObserverInterface
         OauthServiceInterface $oauthService,
         KangarooCredentialFactory $credentialFactory,
         InitKangarooApp $kangarooData,
-        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
+        \Magento\Catalog\Model\ProductFactory $productFactory
     )
     {
         $this->_logger = $logger;
@@ -74,6 +81,7 @@ class UpdateReviewObserver implements ObserverInterface
         $this->credentialFactory = $credentialFactory;
         $this->kangarooData = $kangarooData;
         $this->customerRepository = $customerRepository;
+        $this->productFactory = $productFactory;
     }
 
     /**
@@ -90,10 +98,20 @@ class UpdateReviewObserver implements ObserverInterface
                     $customer = $this->customerRepository->getById($review['customer_id']);
                     $customerEmail = $customer->getEmail();
                 }
+                $productSku = null;
+                $productTitle = null;
+                if (isset($review['entity_pk_value'])) {
+                    $product = $this->productFactory->create()->load($review['entity_pk_value']);
+                    $productSku = $product->getSku();
+                    $productTitle = $product->getName();
+                }
+
                 $request->post('magento/review', [
                     'review' => $review,
                     'storeId' => $this->kangarooData->getStoreId(),
                     'domain' => $this->kangarooData->getBaseStoreUrl(),
+                    'product_sku' => $productSku,
+                    'product_title' => $productTitle,
                     'customer_email' => $customerEmail,
                 ]);
                 $this->_logger->info("[Kangaroo Rewards]", ['review' => $review]);
