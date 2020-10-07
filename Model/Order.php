@@ -58,10 +58,10 @@ class Order
             if ($orderProduct->getProductType() != 'configurable' &&
                 $orderProduct->getProductType() != 'bundle'
             ) {
-                $price = $orderProduct->getPrice();
+                $price = $orderProduct->getBasePrice();
                 if(isset($parent) && $parent->getProductType() == 'configurable')
                 {
-                    $price = $parent->getPrice();
+                    $price = $parent->getBasePrice();
                 }
                 $product = $this->_productFactory->create()->load($orderProduct->getProductId());
                 $data['order']['orderItems'][] = array(
@@ -80,18 +80,18 @@ class Order
             }
         }
 
-        $data['order']['subtotal'] = $this->_order->getSubtotal();
-        $data['order']['taxAmount'] = $this->_order->getTaxAmount();
-        $data['order']['total'] = $this->_order->getGrandTotal();
-        $data['order']['shippingAmount'] = $this->_order->getShippingAmount();
+        $data['order']['subtotal'] = $this->_order->getBaseSubtotal();
+        $data['order']['taxAmount'] = $this->_order->getBaseTaxAmount();
+        $data['order']['total'] = $this->_order->getBaseGrandTotal();
+        $data['order']['shippingAmount'] = $this->_order->getBaseShippingAmount();
         $data['order']['discountCode'] = $this->_order->getCouponCode();
-        $data['order']['discountAmount'] = $this->_order->getDiscountAmount();
+        $data['order']['discountAmount'] = $this->_order->getBaseDiscountAmount();
         $data['order']['createTime'] = $this->_order->getCreatedAt();
-        $data['order']['subtotalRefunded'] = $this->_order->getSubtotalRefunded();
-        $data['order']['discountRefunded'] = $this->_order->getDiscountRefunded();
-        $data['order']['totalRefunded'] = $this->_order->getTotalRefunded();
-        $data['order']['totalDue'] = $this->_order->getTotalDue();
-        $data['order']['totalPaid'] = $this->_order->getTotalPaid();
+        $data['order']['subtotalRefunded'] = $this->_order->getBaseSubtotalRefunded();
+        $data['order']['discountRefunded'] = $this->_order->getBaseDiscountRefunded();
+        $data['order']['totalRefunded'] = $this->_order->getBaseTotalRefunded();
+        $data['order']['totalDue'] = $this->_order->getBaseTotalDue();
+        $data['order']['totalPaid'] = $this->_order->getBaseTotalPaid();
 
         return $data;
     }
