@@ -89,4 +89,11 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+
+    <route url="/V1/kangaroo/reclaim" method="POST">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="reclaim"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

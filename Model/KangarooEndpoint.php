@@ -440,6 +440,28 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '1.1.0';
+        return '2.0.2';
+    }
+
+    public function reclaim($coupon)
+    {
+        $data = [
+            'coupon' => $coupon,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            $response = $this->request->post('magento/reclaim', $data);
+            if ($response->isSuccess()) {
+                return $response->getBody();
+            }
+        }
+
+        return json_encode(["active" => false, "status" => false]);
     }
 }

@@ -78,5 +78,11 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function version();
+
+    /**
+     * @param string $coupon
+     * @return string
+     */
+    public function reclaim($coupon);
     
 }

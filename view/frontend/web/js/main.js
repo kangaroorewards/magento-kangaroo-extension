@@ -9,7 +9,7 @@ define(
             var productList = [];
             var productDetails = [];
             KangarooApps.Loyalties = KangarooApps.Loyalties || {};
-            KangarooApps.Loyalties.version = '1.1.0';
+            KangarooApps.Loyalties.version = '2.0.2';
             KangarooApps.Loyalties.my_account_login = config.baseStoreUrl + "customer/account/login/";
             KangarooApps.Loyalties.my_account_register = config.baseStoreUrl + "customer/account/create/";
             KangarooApps.Loyalties.my_account_page = config.baseStoreUrl + "customer/account/login/";
@@ -95,14 +95,14 @@ define(
                                         id: localData['kangaroo-customer']['customer']['id'],
                                         email: localData['kangaroo-customer']['customer']['email']
                                     };
-                                    $.getScript(config.kangarooAPIUrl + "/magento/initJS?domain="+encodeURI(config.baseStoreUrl));
+                                    $.getScript(config.kangarooAPIUrl + "/magento/initJS?rc=1&domain="+encodeURI(config.baseStoreUrl));
                                 }
                             }
                         }
                     }
                 }
             );
-            $.getScript(config.kangarooAPIUrl + "/magento/initJS?domain="+encodeURI(config.baseStoreUrl));
+            $.getScript(config.kangarooAPIUrl + "/magento/initJS?rc=1&domain="+encodeURI(config.baseStoreUrl));
 
         }
     }
