@@ -27,17 +27,23 @@ class KangarooRewardsRequest
      */
     protected $logger;
 
+    private $lang;
+
     /**
      * KangarooRewardsRequest constructor.
      * @param KangarooCredentialFactory $credentialFactory
      * @param \Psr\Log\LoggerInterface $logger
+     * @param string $lang
      */
     public function __construct(
         KangarooCredentialFactory $credentialFactory,
-        \Psr\Log\LoggerInterface $logger)
+        \Psr\Log\LoggerInterface $logger,
+        $lang = null
+    )
     {
         $this->credentialFactory = $credentialFactory;
         $this->logger = $logger;
+        $this->lang = $lang;
     }
 
     /**
@@ -101,11 +107,13 @@ class KangarooRewardsRequest
         */
         if ($key != '') {
             $httpHeaders = new \Zend\Http\Headers();
-            $httpHeaders->addHeaders(
-                [
-                    'Authorization' => $key
-                ]
-            );
+            $headers = [
+                'Authorization' => $key
+            ];
+            if (isset($this->lang)) {
+                $headers['Accept-Language'] = $this->lang;
+            }
+            $httpHeaders->addHeaders($headers);
             $request->setHeaders($httpHeaders);
         }
 
