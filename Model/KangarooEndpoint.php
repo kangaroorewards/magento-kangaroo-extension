@@ -81,7 +81,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
         $this->logger = $logger;
         $this->customerRepository = $customerRepository;
         $this->httpContext = $httpContext;
-        $this->request = new KangarooRewardsRequest($credentialFactory, $logger);
+        $lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : null;
+        $this->request = new KangarooRewardsRequest($credentialFactory, $logger, $lang);
         $this->productRepository = $productRepository;
     }
 
