@@ -82,9 +82,10 @@ class KangarooRewardsRequest
      * @param $path
      * @param $data
      * @param string $key
+     * @param bool $retry
      * @return \Zend\Http\Response
      */
-    private function _request($method, $path, $data, $key = '')
+    private function _request($method, $path, $data, $key = '', $retry = true)
     {
         $uriPath = self::getKangarooAPIUrl() . '/' . $path;
         $uri = new Uri($uriPath);
@@ -122,10 +123,9 @@ class KangarooRewardsRequest
 
 
         $params = new \Zend\Stdlib\Parameters($data);
-        if($method == \Zend\Http\Request::METHOD_POST) {
+        if ($method == \Zend\Http\Request::METHOD_POST) {
             $request->setPost($params);
-        }
-        elseif($method == \Zend\Http\Request::METHOD_GET) {
+        } elseif ($method == \Zend\Http\Request::METHOD_GET) {
             $request->setQuery($params);
         }
 
@@ -139,6 +139,11 @@ class KangarooRewardsRequest
 
         $client->setOptions($options);
         $response = $client->send($request);
+        if ($retry && $response->getStatus() == 401) {
+            $this->logger->info('[KangarooRewards] - 401 error - path:' . $path);
+            $key = $this->getKangarooAccessToken(true);
+            return $this->_request($method, $path, $data, $key, $retry = false);
+        }
         return $response;
     }
 
@@ -212,24 +217,26 @@ class KangarooRewardsRequest
 
     /**
      * @return string
+     * @param $force
      * @throws \Exception
      */
-    public function getKangarooAccessToken()
+    public function getKangarooAccessToken($force = false)
     {
         $existingCredential = $this->credentialFactory->create()->load(1);
         $item = $existingCredential->getData();
         if (isset($item)) {
             try {
-                if (isset($item['access_token']) && $item['access_token'] != '') {
+                if (!$force && isset($item['access_token']) && $item['access_token'] != '') {
                     if ($item['updated_at'] + $item['expires_in'] > time()) {
+                        $this->logger->info('[KangarooRewards] - Get access token from db.');
                         return $item['access_token'];
                     }
                 }
-
+                $this->logger->info('[KangarooRewards] - Before request a token.' . json_encode($item));
                 return $this->getAccessToken($existingCredential);
 
             } catch (\Exception $e) {
-                $this->logger->info('[KangarooRewards] - Can not get access token');
+                $this->logger->info('[KangarooRewards] - Can not get access token. ' . $e->getMessage());
                 return '';
             }
         }
@@ -251,7 +258,7 @@ class KangarooRewardsRequest
         ];
 
         $response = $this->_request(\Zend\Http\Request::METHOD_POST, 'oauth/token', $sendData);
-//        $this->logger->info('[KangarooRewards]-UpdateAccessToken: ' . $response);
+        $this->logger->info('[KangarooRewards]- UpdateAccessToken');
         if ($response->isSuccess()) {
             $object = json_decode($response->getBody());
             if (isset($object->access_token)) {
