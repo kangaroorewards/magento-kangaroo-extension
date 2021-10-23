@@ -139,7 +139,7 @@ class KangarooRewardsRequest
 
         $client->setOptions($options);
         $response = $client->send($request);
-        if ($retry && $response->getStatus() == 401) {
+        if ($retry && $response->getStatusCode() == 401) {
             $this->logger->info('[KangarooRewards] - 401 error - path:' . $path);
             $key = $this->getKangarooAccessToken(true);
             return $this->_request($method, $path, $data, $key, $retry = false);
