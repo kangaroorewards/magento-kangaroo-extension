@@ -441,7 +441,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.2';
+        return '2.0.3';
     }
 
     public function reclaim($coupon)
