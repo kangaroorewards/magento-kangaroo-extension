@@ -181,13 +181,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
     /**
      * @param int $allow_email
      * @param int $allow_sms
+     * @param string $birth_date
      * @return string
      */
-    public function saveSetting($allow_email, $allow_sms)
+    public function saveSetting($allow_email, $allow_sms, $birth_date)
     {
         $data = [
             'allow_email' => $allow_email,
             'allow_sms' => $allow_sms,
+            'birth_date' => $birth_date,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
@@ -441,7 +443,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.3';
+        return '2.0.4';
     }
 
     public function reclaim($coupon)
