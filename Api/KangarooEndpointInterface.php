@@ -31,9 +31,10 @@ interface KangarooEndpointInterface
     /**
      * @param int $allow_email
      * @param int $allow_sms
+     * @param string $birth_date
      * @return string
      */
-    public function saveSetting($allow_email, $allow_sms);
+    public function saveSetting($allow_email, $allow_sms, $birth_date);
 
     /**
      * @param float $redeemAmount
