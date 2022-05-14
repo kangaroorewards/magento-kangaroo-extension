@@ -17,7 +17,8 @@ class Uninstall implements UninstallInterface
      */
     public function uninstall(SchemaSetupInterface $setup,
         ModuleContextInterface $context
-    ) {
+    )
+    {
         //Uninstall logic
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $storeManager = $objectManager
@@ -40,7 +41,7 @@ class Uninstall implements UninstallInterface
             ->get('\Magento\Integration\Api\IntegrationServiceInterface');
 
         $integrationData = $integrationService->delete($integration->getId());
-        $log->info('[Kangaroo Rewards] Uninstall Id: '.$integration->getId());
+        $log->info('[Kangaroo Rewards] Uninstall Id: ' . $integration->getId());
         if ($integrationData[Info::DATA_ID]) {
             //Integration deleted successfully, now safe to delete the associated consumer data
             if (isset($integrationData[Info::DATA_CONSUMER_ID])) {
@@ -51,14 +52,18 @@ class Uninstall implements UninstallInterface
         $connection = $setup->getConnection();
         $tableName = $setup->getTable('kangaroorewards_credential');
         // Check if the table already exists
-        $log->info('[Kangaroo Rewards] Uninstall getTableName: '.$tableName);
+        $log->info('[Kangaroo Rewards] Uninstall getTableName: ' . $tableName);
         if ($setup->getConnection()->isTableExists($tableName)) {
             $request = new KangarooRewardsRequest($credentialFactory, $log);
             $data = array("domain" => $baseUrl);
-            $log->info('[Kangaroo Rewards] Uninstall table exist: '.$tableName. ' make request to uninstall: '. json_encode($data));
-            $request->post('magento/unInstall', $data);
+            $log->info('[Kangaroo Rewards] Uninstall table exist: ' . $tableName . ' make request to uninstall: ' . json_encode($data));
+            try {
+                $request->post('magento/unInstall', $data);
+            } catch (\Exception $exception) {
+                $log->info('[Kangaroo Rewards] Uninstall error: ' . $exception->getMessage());
+            }
             $connection->dropTable($tableName);
-            $log->info('[Kangaroo Rewards] Uninstall drop table: '.$tableName);
+            $log->info('[Kangaroo Rewards] Uninstall drop table: ' . $tableName);
         }
         $setup->endSetup();
     }
