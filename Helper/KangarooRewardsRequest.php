@@ -94,7 +94,7 @@ class KangarooRewardsRequest
         $uriPath = self::getKangarooAPIUrl() . '/' . $path;
 
         $ch = curl_init();
-        $headers = [];
+        $headers = ["Content-Type: application/json"];
         if ($key != '') {
             $headers[] = "Authorization: Bearer {$key}";
         }
