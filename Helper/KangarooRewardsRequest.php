@@ -3,7 +3,6 @@
  * Prepare for send request to kangaroo api
  */
 namespace Kangaroorewards\Core\Helper;
-use OAuth\Common\Http\Uri\Uri;
 use Kangaroorewards\Core\Model\KangarooCredentialFactory;
 
 /**
@@ -13,9 +12,11 @@ use Kangaroorewards\Core\Model\KangarooCredentialFactory;
  */
 class KangarooRewardsRequest
 {
-    private $_token;
     private static $_baseUri = 'https://integrations.kangarooapis.com/';
     private $_timeout = 240;
+
+    const METHOD_POST = 'POST';
+    const METHOD_GET = 'GET';
 
     /**
      * @var KangarooCredentialFactory
@@ -55,22 +56,24 @@ class KangarooRewardsRequest
     {
         $token = $this->getKangarooAccessToken();
         return $this->_request(
-            \Zend\Http\Request::METHOD_POST,
+            self::METHOD_POST,
             $path,
             $data,
             $token
         );
     }
+
     /**
      * @param $path
      * @param array $data
      * @return mixed
+     * @throws \Exception
      */
     public function get($path, $data = array())
     {
         $token = $this->getKangarooAccessToken();
         return $this->_request(
-            \Zend\Http\Request::METHOD_GET,
+            self::METHOD_GET,
             $path,
             $data,
             $token
@@ -83,127 +86,64 @@ class KangarooRewardsRequest
      * @param $data
      * @param string $key
      * @param bool $retry
-     * @return \Zend\Http\Response
+     * @return mixed
+     * @throws \Exception
      */
     private function _request($method, $path, $data, $key = '', $retry = true)
     {
         $uriPath = self::getKangarooAPIUrl() . '/' . $path;
-        $uri = new Uri($uriPath);
 
-        $request = new \Zend\Http\Request();
-
-        /*
-         * This is for the first version signature
-        if ($this->_token != '') {
-            $httpHeaders = new \Zend\Http\Headers();
-            $httpHeaders->addHeaders(
-                [
-                'x-signature' => $this->_getSignature($this->_token, $uri, $data),
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json'
-                ]
-            );
-            $request->setHeaders($httpHeaders);
-        }
-        */
+        $ch = curl_init();
+        $headers = ["Content-Type: application/json"];
         if ($key != '') {
-            $httpHeaders = new \Zend\Http\Headers();
-            $headers = [
-                'Authorization' => $key
-            ];
-            if (isset($this->lang)) {
-                $headers['Accept-Language'] = $this->lang;
+            $headers[] = "Authorization: Bearer {$key}";
+        }
+
+        if (isset($this->lang)) {
+            $headers[] = "Accept-Language: " . $this->lang;
+        }
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
+        $curlOptPost = ($method === self::METHOD_POST) ? 1 : 0;
+        curl_setopt($ch, CURLOPT_POST, $curlOptPost);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_URL, $uriPath);
+
+        if (count($data) > 0) {
+            if ($method == self::METHOD_GET) {
+                curl_setopt($ch, CURLOPT_URL, $uriPath . '?' . http_build_query($data));
+            } else {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
             }
-            $httpHeaders->addHeaders($headers);
-            $request->setHeaders($httpHeaders);
         }
 
-        $request->setUri($uriPath);
-        $request->setMethod($method);
+        $response = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $error = curl_error($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-
-        $params = new \Zend\Stdlib\Parameters($data);
-        if ($method == \Zend\Http\Request::METHOD_POST) {
-            $request->setPost($params);
-        } elseif ($method == \Zend\Http\Request::METHOD_GET) {
-            $request->setQuery($params);
-        }
-
-        $client = new \Zend\Http\Client();
-        $options = [
-            'adapter' => 'Zend\Http\Client\Adapter\Curl',
-            'curloptions' => [CURLOPT_FOLLOWLOCATION => true],
-            'maxredirects' => 0,
-            'timeout' => $this->_timeout
-        ];
-
-        $client->setOptions($options);
-        $response = $client->send($request);
-        if ($retry && $response->getStatusCode() == 401) {
+        if ($retry && $httpCode == 401) {
             $this->logger->info('[KangarooRewards] - 401 error - path:' . $path);
             $key = $this->getKangarooAccessToken(true);
             return $this->_request($method, $path, $data, $key, $retry = false);
+        } else if ($errno || $httpCode >= 400) {
+            $this->logger->info('[KangarooRewards] Request error - ' . json_encode([
+                    'url' => $path,
+                    'payload' => $data,
+                    'error' => $error,
+                    'errno' => $errno,
+                    'response' => $response
+                ]));
         }
+
         return $response;
-    }
-
-    /**
-     * @param string $signKey
-     * @param Uri    $uri
-     * @param array  $params
-     * @param string $method
-     * @return string
-     */
-    private function _getSignature(string $signKey,
-        Uri $uri,
-        array $params,
-        $method = 'POST'
-    ) {
-        $queryStringData = !$uri->getQuery() ? [] : array_reduce(
-            explode('&', $uri->getQuery()),
-            function ($carry, $item) {
-                list($key, $value) = explode('=', $item, 2);
-                $carry[rawurldecode($key)] = rawurldecode($value);
-                return $carry;
-            },
-            []
-        );
-
-        foreach (array_merge($queryStringData, $params) as $key => $value) {
-            $signatureData[rawurlencode($key)] = rawurlencode($value);
-        }
-
-        ksort($signatureData);
-
-        $baseString = strtoupper($method) . '&';
-        $baseString .= rawurlencode($this->_buildSignatureDataString($signatureData));
-
-        return base64_encode(
-            hash_hmac(
-                'sha512',
-                $baseString,
-                rawurlencode($signKey),
-                true
-            )
-        );
-    }
-
-    /**
-     * @param array $signatureData
-     *
-     * @return string
-     */
-    private function _buildSignatureDataString(array $signatureData)
-    {
-        $signatureString = '';
-        $delimiter = '';
-        foreach ($signatureData as $key => $value) {
-            $signatureString .= $delimiter . $key . '=' . $value;
-
-            $delimiter = '&';
-        }
-
-        return $signatureString;
     }
 
     /**
@@ -246,6 +186,7 @@ class KangarooRewardsRequest
     /**
      * @param $credential
      * @return string
+     * @throws \Exception
      */
     private function getAccessToken($credential)
     {
@@ -257,17 +198,17 @@ class KangarooRewardsRequest
             'scope' => $item['scope'],
         ];
 
-        $response = $this->_request(\Zend\Http\Request::METHOD_POST, 'oauth/token', $sendData);
+        $response = $this->_request(self::METHOD_POST, 'oauth/token', $sendData);
         $this->logger->info('[KangarooRewards]- UpdateAccessToken');
-        if ($response->isSuccess()) {
-            $object = json_decode($response->getBody());
-            if (isset($object->access_token)) {
-                $credential->setAccessToken($object->access_token);
-                $credential->setExpiresIn($object->expires_in);
-                $credential->save();
-                return $object->access_token;
-            }
+
+        $object = json_decode($response, false);
+        if (isset($object->access_token)) {
+            $credential->setAccessToken($object->access_token);
+            $credential->setExpiresIn($object->expires_in);
+            $credential->save();
+            return $object->access_token;
         }
+
         return '';
     }
 

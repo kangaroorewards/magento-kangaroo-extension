@@ -121,11 +121,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl()
         ];
-        $response = $this->request->get('magento/translation', $data);
-        if($response->isSuccess()){
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/translation', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -148,11 +148,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        $response = $this->request->get('magento/transaction', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/transaction', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -171,11 +171,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        $response = $this->request->get('magento/balance', $data);
-        if($response->isSuccess()){
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/balance', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -200,11 +200,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        $response = $this->request->get('magento/saveSetting', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/saveSetting', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -225,7 +225,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if($this->kangarooData->isShoppingCartExist()) {
+        if ($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['cart'] = $cart->id;
@@ -233,11 +233,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             }
         }
 
-        $response = $this->request->get('magento/redeem', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/redeem', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -250,11 +250,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
 
-        $response = $this->request->get('magento/welcomeMessage', $data);
-        if($response->isSuccess()){
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/welcomeMessage', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -282,11 +282,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
             }
         }
 
-        $response = $this->request->get('magento/redeemCatalog', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+        try {
+            return $this->request->get('magento/redeemCatalog', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -307,7 +307,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         $product = $this->getProductBySKU($sku);
-        if($product) {
+        if ($product) {
             $data['productId'] = $product->code;
             $productDetail = [];
             foreach ($product->product as $item) {
@@ -324,9 +324,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['product'] = ['id' => $product->code,
                 'product' => $productDetail];
 
-            $response = $this->request->post('magento/getProductOffer', $data);
-            if ($response->isSuccess()) {
-                return $response->getBody();
+            try {
+                return $this->request->post('magento/getProductOffer', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
         }
         return json_encode(["active" => false]);
@@ -348,7 +349,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if($this->kangarooData->isShoppingCartExist()) {
+        if ($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['discount'] = $cart->discount;
@@ -368,11 +369,12 @@ class KangarooEndpoint implements KangarooEndpointInterface
                 $data['productList'] = $productList;
             }
         }
-        $response = $this->request->post('magento/getShoppingCartItemPrice', $data);
-        if ($response->isSuccess()) {
-            return $response->getBody();
+
+        try {
+            return $this->request->post('magento/getShoppingCartItemPrice', $data);
+        } catch (\Exception $exception) {
+            return json_encode(["active" => false, 'error' => $exception->getMessage()]);
         }
-        return json_encode(["active" => false]);
     }
 
     /**
@@ -432,9 +434,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
 
-            $response = $this->request->get('magento/redeemOffer', $data);
-            if ($response->isSuccess()) {
-                return $response->getBody();
+            try {
+                return $this->request->get('magento/redeemOffer', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
         }
 
@@ -443,7 +446,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.4';
+        return '2.0.5';
     }
 
     public function reclaim($coupon)
@@ -459,9 +462,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
 
-            $response = $this->request->post('magento/reclaim', $data);
-            if ($response->isSuccess()) {
-                return $response->getBody();
+            try {
+                return $this->request->post('magento/reclaim', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
         }
 
