@@ -163,15 +163,31 @@ class KangarooRewardsRequest
     public function getKangarooAccessToken($force = false)
     {
         $existingCredential = $this->credentialFactory->create()->load(1);
-        $item = $existingCredential->getData();
-        if (isset($item)) {
+        $id = $existingCredential->getId();
+        if (!isset($id)) {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $resourceConnection = $objectManager
+                ->get('\Magento\Framework\App\ResourceConnection');
+            $connection = $resourceConnection->getConnection();
+            $sql = "select id FROM kangaroorewards_credential order by id desc limit 1";
+            $latestIdResults = $connection->fetchAll($sql);
+            if (isset($latestIdResults[0]['id'])) {
+                $id = $latestIdResults[0]['id'];
+                $existingCredential = $this->credentialFactory->create()->load($id);
+                $this->logger->info('[KangarooRewards] - Get kangaroo credential from db. Id:' . $id);
+            }
+        }
+
+        if (isset($id)) {
             try {
+                $item = $existingCredential->getData();
                 if (!$force && isset($item['access_token']) && $item['access_token'] != '') {
                     if ($item['updated_at'] + $item['expires_in'] > time()) {
-                        $this->logger->info('[KangarooRewards] - Get access token from db.');
+                        $this->logger->info('[KangarooRewards] - Get access token from db.', $item);
                         return $item['access_token'];
                     }
                 }
+
                 $this->logger->info('[KangarooRewards] - Before request a token.' . json_encode($item));
                 return $this->getAccessToken($existingCredential);
 
@@ -180,6 +196,7 @@ class KangarooRewardsRequest
                 return '';
             }
         }
+        $this->logger->info('[KangarooRewards][getKangarooAccessToken] Error - Kangaroo credential not found.');
         return '';
     }
 
