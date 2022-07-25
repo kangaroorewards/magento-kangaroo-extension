@@ -96,4 +96,11 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+
+    <route url="/V1/kangaroo/surveyAnswers" method="POST">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="surveyAnswers"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

@@ -44,10 +44,25 @@ class KangarooCredentialRepository
      */
     public function save(\Kangaroorewards\Core\Api\Data\KangarooCredentialInterface $credential)
     {
-        $existingCredential = $this->credentialFactory->create()->load(1);
-        $mergedData = array_merge($existingCredential->getData(), $credential->getData());
-        $credential->setData($mergedData);
-        $this->resourceModel->save($credential);
-        return $credential;
+        $credentialResource = $this->credentialFactory->create()->load(1);
+        $id = $credentialResource->getId();
+        if (isset($id)) {
+            //update first record
+            $credential->setId(1);
+            $credential->setAccessToken(null);
+            $credential->setRefreshToken(null);
+            $credential->setExpiresIn(null);
+            $this->resourceModel->save($credential);
+            return $credential;
+        } else {
+            $connection = $this->resourceModel->getConnection();
+            $clientId = $credential->getClientId();
+            $secret = $credential->getClientSecret();
+            $scope = $credential->getScope();
+            $sql = "insert into kangaroorewards_credential (id, client_id, client_secret, scope) values(1, '{$clientId}','{$secret}','{$scope}')";
+            $connection->query($sql);
+            $credentialResource = $this->credentialFactory->create()->load(1);
+            return $credentialResource;
+        }
     }
 }

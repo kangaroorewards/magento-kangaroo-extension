@@ -140,6 +140,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'page' => $page,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
+            'include' => "surveys"
         ];
 
         if ($this->isCustomerLoggedIn()) {
@@ -446,7 +447,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.5';
+        return '2.0.6';
     }
 
     public function reclaim($coupon)
@@ -464,6 +465,39 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             try {
                 return $this->request->post('magento/reclaim', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
+            }
+        }
+
+        return json_encode(["active" => false, "status" => false]);
+    }
+
+    /**
+     * @param int $surveyId
+     * @param SurveyAnswer[] $surveyAnswers
+     * @return false|mixed|string
+     */
+    public function surveyAnswers($surveyId, $surveyAnswers)
+    {
+        $data = [
+            'survey_id' => $surveyId,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        foreach ($surveyAnswers as $surveyAnswer){
+            $data['survey_answers'][] = $surveyAnswer->getAttributes();
+        }
+
+        $this->logger->info('[Kangaroo Rewards]KangarooEndpoint_surveyAnswers: ', $data);
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            try {
+                return $this->request->post('magento/surveyAnswers', $data);
             } catch (\Exception $exception) {
                 return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
