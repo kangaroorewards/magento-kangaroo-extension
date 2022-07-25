@@ -85,5 +85,12 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function reclaim($coupon);
+
+    /**
+     * @param int $surveyId
+     * @param \Kangaroorewards\Core\Model\SurveyAnswer[] $surveyAnswers
+     * @return string
+     */
+    public function surveyAnswers($surveyId, $surveyAnswers);
     
 }
