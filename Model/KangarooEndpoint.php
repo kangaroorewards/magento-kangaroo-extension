@@ -447,7 +447,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.6';
+        return '2.0.7';
     }
 
     public function reclaim($coupon)
@@ -498,6 +498,33 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             try {
                 return $this->request->post('magento/surveyAnswers', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
+            }
+        }
+
+        return json_encode(["active" => false, "status" => false]);
+    }
+
+    /**
+     * @param int $actionId
+     * @return string
+     */
+    public function callToActions($actionId)
+    {
+        $data = [
+            'action_id' => $actionId,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            try {
+                return $this->request->post('magento/call-to-actions', $data);
             } catch (\Exception $exception) {
                 return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }

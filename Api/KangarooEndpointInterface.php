@@ -92,5 +92,11 @@ interface KangarooEndpointInterface
      * @return string
      */
     public function surveyAnswers($surveyId, $surveyAnswers);
-    
+
+    /**
+     * @param int $actionId
+     * @return string
+     */
+    public function callToActions($actionId);
+
 }
