@@ -99,6 +99,17 @@ define(
                     }
                 }
             }
+
+            $('#product-addtocart-button').on('click', function () {
+                fetch(config.baseStoreUrl + '/rest/V1/kangaroo/cart-info').then(response => {
+                    return response.json();
+                }).then(data => {
+                    let responseArray = JSON.parse(data);
+                    if (typeof responseArray.data !== 'undefined' && responseArray.data != null) {
+                        initialLoyaltyCheckout(responseArray.data);
+                    }
+                });
+            });
         }
     }
 );
