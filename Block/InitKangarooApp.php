@@ -72,7 +72,7 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
         if ($isLogin) {
             return true;
         } else {
-            return $this->httpContext->getValue(Context::CONTEXT_AUTH);
+            return (bool)$this->httpContext->getValue(Context::CONTEXT_AUTH);
         }
 
     }

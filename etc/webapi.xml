@@ -103,4 +103,25 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+
+    <route url="/V1/kangaroo/call-to-actions" method="POST">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="callToActions"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/kangaroo/customer" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getCustomerInfo"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/kangaroo/cart-info" method="GET">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="getCartInfo"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
