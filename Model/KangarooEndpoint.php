@@ -17,42 +17,42 @@ use Kangaroorewards\Core\Model\KangarooCredentialFactory;
 class KangarooEndpoint implements KangarooEndpointInterface
 {
     /**
-     * @var InitKangarooApp 
+     * @var InitKangarooApp
      */
     protected $kangarooData;
-    
+
     /**
-     * @var KangarooRewardsRequest 
+     * @var KangarooRewardsRequest
      */
     protected $request;
-    
+
     /**
-     * @var 
+     * @var
      */
     protected $customer;
 
     /**
-     * @var \Magento\Customer\Model\Session 
+     * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
 
     /**
-     * @var \Psr\Log\LoggerInterface 
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
     /**
-     * @var \Magento\Customer\Api\CustomerRepositoryInterface 
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
      */
     protected $customerRepository;
 
     /**
-     * @var \Magento\Framework\App\Http\Context 
+     * @var \Magento\Framework\App\Http\Context
      */
     protected $httpContext;
 
     /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface 
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
      */
     protected $productRepository;
 
@@ -67,13 +67,13 @@ class KangarooEndpoint implements KangarooEndpointInterface
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
-        InitKangarooApp $kangarooData,
-        \Magento\Customer\Model\Session $customerSession,
+        InitKangarooApp                                   $kangarooData,
+        \Magento\Customer\Model\Session                   $customerSession,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \Magento\Framework\App\Http\Context $httpContext,
-        KangarooCredentialFactory $credentialFactory,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \Psr\Log\LoggerInterface $logger
+        \Magento\Framework\App\Http\Context               $httpContext,
+        KangarooCredentialFactory                         $credentialFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository,
+        \Psr\Log\LoggerInterface                          $logger
     )
     {
         $this->kangarooData = $kangarooData;
@@ -112,14 +112,17 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
         return $this->customer;
     }
+
     /**
+     * @param string|null $url
      * @return string
      */
-    public function translation()
+    public function translation($url = null)
     {
         $data = [
             'storeId' => $this->kangarooData->getStoreId(),
-            'domain' => $this->kangarooData->getBaseStoreUrl()
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+            'url' => $url
         ];
         try {
             return $this->request->get('magento/translation', $data);
@@ -131,13 +134,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
     /**
      * @param int $limit
      * @param int $page
+     * @param string|null $url
      * @return string
      */
-    public function transaction($limit, $page)
+    public function transaction($limit, $page, $url = null)
     {
         $data = [
             'limit' => $limit,
             'page' => $page,
+            'url' => $url,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
             'include' => "surveys,actions"
@@ -157,13 +162,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
+     * @param string|null $url
      * @return string
      */
-    public function balance()
+    public function balance($url = null)
     {
         $data = [
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
+            'url' => $url
         ];
 
         if ($this->isCustomerLoggedIn()) {
@@ -242,13 +249,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
+     * @param string|null $url
      * @return string
      */
-    public function welcomeMessage()
+    public function welcomeMessage($url = null)
     {
         $data = [
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
+            'url' => $url
         ];
 
         try {
@@ -276,7 +285,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $data['customerId'] = $customer->getId();
         }
 
-        if($this->kangarooData->isShoppingCartExist()) {
+        if ($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $data['cart'] = $cart->id;
@@ -383,7 +392,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
      * @return object
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    private function getProductBySKU($sku){
+    private function getProductBySKU($sku)
+    {
         $product = $this->productRepository->get($sku);
         if ($product->getTypeId() == 'simple' ||
             $product->getTypeId() == 'virtual' ||
@@ -399,7 +409,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             return (object)["code" => $product->getSku(),
                 "product" => $productL];
-        } else if ($product->getTypeId() == 'configurable'){
+        } else if ($product->getTypeId() == 'configurable') {
             $parentId = $product->getId();
             return (object)["code" => $product->getSku(),
                 "product" => $this->kangarooData->getChildren($parentId)];
@@ -413,7 +423,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
     public function getShoppingCartSubtotal()
     {
         $subtotal = 0;
-        if($this->kangarooData->isShoppingCartExist()) {
+        if ($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $subtotal = $cart->subtotal;
@@ -486,7 +496,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
 
-        foreach ($surveyAnswers as $surveyAnswer){
+        foreach ($surveyAnswers as $surveyAnswer) {
             $data['survey_answers'][] = $surveyAnswer->getAttributes();
         }
 
@@ -531,5 +541,37 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         return json_encode(["active" => false, "status" => false]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomerInfo()
+    {
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['email'] = $customer->getEmail();
+            $data['id'] = $customer->getId();
+
+            return json_encode(["active" => true, 'data' => $data]);
+        }
+
+        return json_encode(["active" => true, 'data' => null]);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCartInfo()
+    {
+        if ($this->kangarooData->isShoppingCartExist()) {
+            $cart = $this->kangarooData->getCart();
+            if ($cart) {
+                return json_encode(["active" => true, 'data' => $cart]);
+            }
+        }
+
+        return json_encode(["active" => true, 'data' => null]);
     }
 }
