@@ -364,6 +364,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             if ($cart) {
                 $data['discount'] = $cart->discount;
                 $data['subtotal'] = $cart->subtotal;
+                $data['taxAmount'] = $cart->taxAmount;
                 $data['cart'] = $cart->id;
                 $productList = [];
                 foreach ($cart->cartItems as $item) {
@@ -374,6 +375,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
                         'price' => $item["price"],
                         'quantity' => $item["quantity"],
                         'categories' => $item["categories"],
+                        'taxAmount' => $item["taxAmount"]
                     ];
                 }
                 $data['productList'] = $productList;
@@ -422,14 +424,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     public function getShoppingCartSubtotal()
     {
-        $subtotal = 0;
+        $subtotal = $total = 0;
         if ($this->kangarooData->isShoppingCartExist()) {
             $cart = $this->kangarooData->getCart();
             if ($cart) {
                 $subtotal = $cart->subtotal;
+                $total = $subtotal + $cart->taxAmount;
             }
         }
-        return json_encode(["subtotal" => $subtotal]);
+        return json_encode(["subtotal" => $subtotal, 'total' => $total]);
     }
 
     public function redeemOffer($qrcode)

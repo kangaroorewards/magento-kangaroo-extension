@@ -227,11 +227,14 @@ class InitKangarooApp extends \Magento\Framework\View\Element\Template
                         'productId' => $item->getProductId(),
                         'price' => $price,
                         'quantity' => $quantity,
-                        'categories' => $product->getCategoryIds()
+                        'categories' => $product->getCategoryIds(),
+                        'taxAmount' => $item->getTaxAmount()
                     );
                 }
             }
-            $result = (object)['subtotal' => $cart->getSubtotal(),
+            $result = (object)[
+                'subtotal' => $cart->getSubtotal(),
+                'taxAmount' => $cart->getShippingAddress()->getData('tax_amount'),
                 'id' => $cart->getId(),
                 'cartItems' => $cartItems,
                 'discount' => $cart->getSubtotal() - $cart->getSubtotalWithDiscount()
