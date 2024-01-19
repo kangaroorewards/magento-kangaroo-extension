@@ -12,7 +12,7 @@ use Kangaroorewards\Core\Model\KangarooCredentialFactory;
  */
 class KangarooRewardsRequest
 {
-    private static $_baseUri = 'https://integ-api-dev.traktrok.com/';
+    private static $_baseUri = 'https://integ-api-stg.traktrok.com/';
     private $_timeout = 240;
 
     const METHOD_POST = 'POST';
