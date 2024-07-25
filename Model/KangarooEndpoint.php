@@ -145,7 +145,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'url' => $url,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
-            'include' => "surveys,actions"
+            'include' => "surveys,actions,user.first,user.last,user.opt_out"
         ];
 
         if ($this->isCustomerLoggedIn()) {
@@ -192,9 +192,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
      * @param string|null $birth_date
      * @param string|null $first
      * @param string|null $last
+     * @param string|null $opt_out
      * @return string
      */
-    public function saveSetting($allow_email, $allow_sms, $birth_date = null, $first = null, $last = null)
+    public function saveSetting($allow_email, $allow_sms, $birth_date = null, $first = null, $last = null, $opt_out = null)
     {
         $data = [
             'allow_email' => $allow_email,
@@ -202,6 +203,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'birth_date' => $birth_date,
             'first' => $first,
             'last' => $last,
+            'opt_out' => $opt_out,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
