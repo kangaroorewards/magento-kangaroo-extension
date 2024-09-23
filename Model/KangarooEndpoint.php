@@ -145,7 +145,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'url' => $url,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
-            'include' => "surveys,actions"
+            'include' => "surveys,actions,user.first,user.last,user.opt_out"
         ];
 
         if ($this->isCustomerLoggedIn()) {
@@ -189,15 +189,21 @@ class KangarooEndpoint implements KangarooEndpointInterface
     /**
      * @param int $allow_email
      * @param int $allow_sms
-     * @param string $birth_date
+     * @param string|null $birth_date
+     * @param string|null $first
+     * @param string|null $last
+     * @param string|null $opt_out
      * @return string
      */
-    public function saveSetting($allow_email, $allow_sms, $birth_date)
+    public function saveSetting($allow_email, $allow_sms, $birth_date = null, $first = null, $last = null, $opt_out = null)
     {
         $data = [
             'allow_email' => $allow_email,
             'allow_sms' => $allow_sms,
             'birth_date' => $birth_date,
+            'first' => $first,
+            'last' => $last,
+            'opt_out' => $opt_out,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
         ];
@@ -460,7 +466,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.7';
+        return '2.0.8';
     }
 
     public function reclaim($coupon)
