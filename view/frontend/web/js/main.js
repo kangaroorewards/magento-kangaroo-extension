@@ -5,7 +5,7 @@ define(
     function ($) {
         "use strict";
         return function (config) {
-            KangarooApps = KangarooApps || {};
+            var KangarooApps = KangarooApps || {};
             var productList = [];
             var productDetails = [];
             KangarooApps.Loyalties = KangarooApps.Loyalties || {};
