@@ -9,5 +9,10 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\App\Action\AbstractAction">
+        <arguments>
+            <argument name="context" xsi:type="object">Magento\Framework\App\Action\Context</argument>
+        </arguments>
+    </type>
 </config>
 
