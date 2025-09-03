@@ -107,6 +107,12 @@ interface KangarooEndpointInterface
     public function callToActions($actionId);
 
     /**
+     * @param int $spinWinId
+     * @return string
+     */
+    public function spinDraw($spinWinId);
+
+    /**
      * @return string
      */
     public function getCustomerInfo();

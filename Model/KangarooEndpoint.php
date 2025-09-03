@@ -466,7 +466,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.9';
+        return '2.0.10';
     }
 
     public function reclaim($coupon)
@@ -544,6 +544,29 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             try {
                 return $this->request->post('magento/call-to-actions', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
+            }
+        }
+
+        return json_encode(["active" => false, "status" => false]);
+    }
+
+    public function spinDraw($spinWinId)
+    {
+        $data = [
+            'spin_win_id' => $spinWinId,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            try {
+                return $this->request->post('magento/spin-draw', $data);
             } catch (\Exception $exception) {
                 return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
