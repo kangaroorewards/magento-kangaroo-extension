@@ -145,7 +145,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'url' => $url,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
-            'include' => "surveys,actions,user.first,user.last,user.opt_out"
+            'include' => "surveys,actions,user.first,user.last,user.opt_out,user_spin_win"
         ];
 
         if ($this->isCustomerLoggedIn()) {
