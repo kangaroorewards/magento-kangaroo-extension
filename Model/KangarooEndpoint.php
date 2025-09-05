@@ -552,6 +552,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
         return json_encode(["active" => false, "status" => false]);
     }
 
+    /**
+     * @param int $spinWinId
+     * @return string
+     */
     public function spinDraw($spinWinId)
     {
         $data = [
