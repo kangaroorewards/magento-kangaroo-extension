@@ -568,9 +568,10 @@ class KangarooEndpoint implements KangarooEndpointInterface
             $customer = $this->_getCustomer();
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
-            
+
             try {
-                return $this->request->post('magento/spin-draw', $data);
+                $response = $this->request->post('magento/spin-draw', $data);
+                return $this->safeJsonDecode($response);
             } catch (\Exception $exception) {
                 return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
@@ -609,5 +610,18 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         return json_encode(["active" => true, 'data' => null]);
+    }
+
+    private function safeJsonDecode($response)
+    {
+        if (!is_string($response)) {
+            // Already an array/object, return as-is
+            return $response;
+        }
+
+        $decoded = json_decode($response, true);
+
+        // If decoding fails, return original string
+        return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $response;
     }
 }
