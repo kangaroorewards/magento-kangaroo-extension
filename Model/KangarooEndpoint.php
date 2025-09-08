@@ -558,7 +558,6 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     public function spinDraw($spinWinId)
     {
-        return json_encode(["message" => "Method initialized", "spin_id" => $spinWinId]);
         $data = [
             'spin_win_id' => $spinWinId,
             'storeId' => $this->kangarooData->getStoreId(),
