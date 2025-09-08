@@ -119,6 +119,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     public function translation($url = null)
     {
+        return json_encode(["message" => "test"]);
         $data = [
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
