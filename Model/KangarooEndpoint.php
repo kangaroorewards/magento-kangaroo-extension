@@ -571,7 +571,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             try {
                 $response = $this->request->post('magento/spin-draw', $data);
-                return $this->safeJson($response);
+                $decoded = json_decode($response, true);
+                return json_encode($decoded);
             } catch (\Exception $exception) {
                 return json_encode(["active" => false, 'error' => $exception->getMessage()]);
             }
