@@ -565,10 +565,11 @@ class KangarooEndpoint implements KangarooEndpointInterface
         ];
 
         if ($this->isCustomerLoggedIn()) {
-            return json_encode(["spin_win_id" => $spinWinId, "status" => 'not-logged-in']);
             $customer = $this->_getCustomer();
             $data['customerEmail'] = $customer->getEmail();
             $data['customerId'] = $customer->getId();
+
+            return json_encode(["spin_win_id" => $spinWinId, "id" => $customer->getId()]);
 
             try {
                 return $this->request->post('magento/spin-draw', $data);
