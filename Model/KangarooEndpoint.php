@@ -145,7 +145,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
             'url' => $url,
             'storeId' => $this->kangarooData->getStoreId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
-            'include' => "surveys,actions,user.first,user.last,user.opt_out"
+            'include' => "surveys,actions,user.first,user.last,user.opt_out,user_spin_win"
         ];
 
         if ($this->isCustomerLoggedIn()) {
@@ -466,7 +466,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.8';
+        return '2.0.12';
     }
 
     public function reclaim($coupon)
@@ -553,6 +553,33 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
+     * @param int $spinWinId
+     * @return string
+     */
+    public function spinDraw($spinWinId)
+    {
+        $data = [
+            'spin_win_id' => $spinWinId,
+            'storeId' => $this->kangarooData->getStoreId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+        ];
+
+        if ($this->isCustomerLoggedIn()) {
+            $customer = $this->_getCustomer();
+            $data['customerEmail'] = $customer->getEmail();
+            $data['customerId'] = $customer->getId();
+
+            try {
+                return $this->request->post('magento/spin-draw', $data);
+            } catch (\Exception $exception) {
+                return json_encode(["active" => false, 'error' => $exception->getMessage()]);
+            }
+        }
+
+        return json_encode(["active" => false, "status" => false]);
+    }
+
+    /**
      * @return string
      */
     public function getCustomerInfo()
@@ -582,5 +609,24 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         return json_encode(["active" => true, 'data' => null]);
+    }
+
+    private function safeJson($response): string
+    {
+        // If it's already an array or object, just encode it
+        if (is_array($response) || is_object($response)) {
+            return json_encode($response);
+        }
+
+        // If it's a string, try to decode it first
+        $decoded = json_decode($response, true);
+
+        // If decoding fails, return original string
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $response;
+        }
+
+        // Return encoded JSON
+        return json_encode($decoded);
     }
 }
