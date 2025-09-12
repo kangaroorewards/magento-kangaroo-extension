@@ -21,7 +21,7 @@ class KangarooCredentialRepository
     /**
      * @var Kangaroorewards\Core\Model\ResourceModel\KangarooCredential
      */
-    protected $recourceModel;
+    protected $resourceModel;
 
     /**
      * KangarooCredentialRepository constructor.
