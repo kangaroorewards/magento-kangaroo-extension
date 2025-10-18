@@ -123,4 +123,11 @@ interface KangarooEndpointInterface
      */
     public function getCartInfo();
 
+
+    /**
+     * @param string $sku
+     * @return string
+     */
+    public function getProductImages($sku);
+
 }
