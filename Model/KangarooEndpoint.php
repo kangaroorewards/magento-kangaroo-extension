@@ -56,6 +56,17 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     protected $productRepository;
 
+
+    /**
+     * @var \Magento\Catalog\Helper\Image
+     */
+    protected $imageHelper;
+
+    /**
+     * @var \Magento\Store\Model\App\Emulation
+     */
+    protected $emulation;
+
     /**
      * KangarooEndpoint constructor.
      * @param InitKangarooApp $kangarooData
@@ -64,6 +75,9 @@ class KangarooEndpoint implements KangarooEndpointInterface
      * @param \Magento\Framework\App\Http\Context $httpContext
      * @param \Kangaroorewards\Core\Model\KangarooCredentialFactory $credentialFactory
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Catalog\Helper\Image $imageHelper
+     * @param \Magento\Store\Model\App\Emulation $emulation
+     * ImageHelper $imageHelper,
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(
@@ -73,6 +87,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
         \Magento\Framework\App\Http\Context               $httpContext,
         KangarooCredentialFactory                         $credentialFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository,
+        \Magento\Catalog\Helper\Image                     $imageHelper,
+        \Magento\Store\Model\App\Emulation                $emulation,
         \Psr\Log\LoggerInterface                          $logger
     )
     {
@@ -84,6 +100,8 @@ class KangarooEndpoint implements KangarooEndpointInterface
         $lang = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? $_SERVER['HTTP_ACCEPT_LANGUAGE'] : null;
         $this->request = new KangarooRewardsRequest($credentialFactory, $logger, $lang);
         $this->productRepository = $productRepository;
+        $this->imageHelper = $imageHelper;
+        $this->emulation = $emulation;
     }
 
     /**
@@ -466,7 +484,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.10';
+        return '2.0.11';
     }
 
     public function reclaim($coupon)
@@ -611,22 +629,29 @@ class KangarooEndpoint implements KangarooEndpointInterface
         return json_encode(["active" => true, 'data' => null]);
     }
 
-    private function safeJson($response): string
+    /**
+     * @param string $sku
+     * @return string
+     */
+    public function getProductImages($sku)
     {
-        // If it's already an array or object, just encode it
-        if (is_array($response) || is_object($response)) {
-            return json_encode($response);
+        $storeId = $this->kangarooData->getStoreId();
+        $initialEnvironment = $this->emulation->startEnvironmentEmulation($storeId, 'frontend', true);
+
+        try {
+            $product = $this->productRepository->get($sku, false, $storeId);
+
+            $images = [
+                'base' => $this->imageHelper->init($product, 'product_page_image_large')->resize(800)->getUrl(),
+                'small' => $this->imageHelper->init($product, 'product_page_image_small')->resize(300)->getUrl(),
+                'thumbnail' => $this->imageHelper->init($product, 'product_thumbnail_image')->resize(75)->getUrl(),
+            ];
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $images = [];
+        } finally {
+            $this->emulation->stopEnvironmentEmulation($initialEnvironment);
         }
 
-        // If it's a string, try to decode it first
-        $decoded = json_decode($response, true);
-
-        // If decoding fails, return original string
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $response;
-        }
-
-        // Return encoded JSON
-        return json_encode($decoded);
+        return json_encode(["images" => $images]);
     }
 }
