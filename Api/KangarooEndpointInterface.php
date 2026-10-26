@@ -130,4 +130,34 @@ interface KangarooEndpointInterface
      */
     public function getProductImages($sku);
 
+    /**
+     * Forward a storefront event to the integration API.
+     *
+     * @param string $event_type
+     * @param mixed[] $resource
+     * @param string|null $occurred_at
+     * @param mixed[]|null $metadata
+     * @param mixed[]|null $payload
+     * @param mixed[]|null $context
+     * @return string
+     */
+    public function storeCollectedEvent(
+        $event_type,
+        $resource,
+        $occurred_at = null,
+        $metadata = null,
+        $payload = null,
+        $context = null
+    );
+
+    /**
+     * Notify the integration API that Magento shipment tracking changed.
+     *
+     * @param int $orderId
+     * @param string $domain
+     * @param string $storeId
+     * @return string
+     */
+    public function notifyShipmentUpdate($orderId, $domain, $storeId);
+
 }

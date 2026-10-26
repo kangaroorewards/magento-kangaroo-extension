@@ -484,7 +484,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
     public function version()
     {
-        return '2.0.11';
+        return '2.0.12';
     }
 
     public function reclaim($coupon)
@@ -653,5 +653,73 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         return json_encode(["images" => $images]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function storeCollectedEvent(
+        $event_type,
+        $resource,
+        $occurred_at = null,
+        $metadata = null,
+        $payload = null,
+        $context = null
+    ) {
+        if (!$this->isCustomerLoggedIn()) {
+            return json_encode([
+                'active' => false,
+                'error' => 'Customer authentication is required to submit collected events.',
+            ]);
+        }
+
+        $customer = $this->_getCustomer();
+        $data = array_filter([
+            'event_type' => $event_type,
+            'customer_id' => (string) $customer->getId(),
+            'domain' => $this->kangarooData->getBaseStoreUrl(),
+            'store_id' => (string) $this->kangarooData->getStoreId(),
+            'occurred_at' => $occurred_at,
+            'resource' => $resource,
+            'metadata' => $metadata,
+            'payload' => $payload,
+            'context' => $context,
+        ], function ($value) {
+            return $value !== null;
+        });
+
+        try {
+            return $this->request->post('magento/collected-events', $data);
+        } catch (\Exception $exception) {
+            $this->logger->error('[Kangaroo Rewards] Collected event forwarding failed', [
+                'event_type' => $event_type,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return json_encode(['active' => false, 'error' => $exception->getMessage()]);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function notifyShipmentUpdate($orderId, $domain, $storeId)
+    {
+        try {
+            return $this->request->post('magento/shipment-update', [
+                'orderId' => $orderId,
+                'domain' => $domain,
+                'storeId' => $storeId,
+            ]);
+        } catch (\Exception $exception) {
+            $this->logger->error('[Kangaroo Rewards] Shipment update notification failed', [
+                'order_id' => $orderId,
+                'domain' => $domain,
+                'store_id' => $storeId,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return json_encode(['active' => false, 'error' => $exception->getMessage()]);
+        }
     }
 }

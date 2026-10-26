@@ -137,4 +137,10 @@
             <resource ref="anonymous"/>
         </resources>
     </route>
+    <route url="/V1/kangaroo/collected-events" method="POST">
+        <service class="Kangaroorewards\Core\Api\KangarooEndpointInterface" method="storeCollectedEvent"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
