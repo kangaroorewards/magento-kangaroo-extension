@@ -656,7 +656,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
-     * @inheritdoc
+     * Forward a storefront event to the integration API.
+     *
+     * @param string $event_type
+     * @param mixed[] $resource
+     * @param string|null $occurred_at
+     * @param mixed[]|null $metadata
+     * @param mixed[]|null $payload
+     * @param mixed[]|null $context
+     * @return string
      */
     public function storeCollectedEvent(
         $event_type,
