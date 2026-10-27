@@ -9,7 +9,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 {
     public function setQuantity($quantity)
     {
-        return $this->_set('quantity', $quantity);
+        return $this->setData('quantity', $quantity);
     }
 
     public function getQuantity()
@@ -19,7 +19,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setProductId($productId)
     {
-        return $this->_set('product_id', $productId);
+        return $this->setData('product_id', $productId);
     }
 
     public function getProductId()
@@ -29,7 +29,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setVariantId($variantId)
     {
-        return $this->_set('variant_id', $variantId);
+        return $this->setData('variant_id', $variantId);
     }
 
     public function getVariantId()
@@ -39,7 +39,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setSku($sku)
     {
-        return $this->_set('sku', $sku);
+        return $this->setData('sku', $sku);
     }
 
     public function getSku()
@@ -49,7 +49,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setName($name)
     {
-        return $this->_set('name', $name);
+        return $this->setData('name', $name);
     }
 
     public function getName()
@@ -59,7 +59,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setCurrency($currency)
     {
-        return $this->_set('currency', $currency);
+        return $this->setData('currency', $currency);
     }
 
     public function getCurrency()
@@ -69,7 +69,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setPrice($price)
     {
-        return $this->_set('price', $price);
+        return $this->setData('price', $price);
     }
 
     public function getPrice()
@@ -79,7 +79,7 @@ class Attributes extends AbstractSimpleObject implements CollectedEventAttribute
 
     public function setCategories($categories)
     {
-        return $this->_set('categories', $categories);
+        return $this->setData('categories', $categories);
     }
 
     public function getCategories()

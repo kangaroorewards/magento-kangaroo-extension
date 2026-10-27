@@ -10,7 +10,7 @@ class Resource extends AbstractSimpleObject implements CollectedEventResourceInt
 {
     public function setId($id)
     {
-        return $this->_set('id', $id);
+        return $this->setData('id', $id);
     }
 
     public function getId()
@@ -20,7 +20,7 @@ class Resource extends AbstractSimpleObject implements CollectedEventResourceInt
 
     public function setType($type)
     {
-        return $this->_set('type', $type);
+        return $this->setData('type', $type);
     }
 
     public function getType()
@@ -30,7 +30,7 @@ class Resource extends AbstractSimpleObject implements CollectedEventResourceInt
 
     public function setName($name)
     {
-        return $this->_set('name', $name);
+        return $this->setData('name', $name);
     }
 
     public function getName()
@@ -40,7 +40,7 @@ class Resource extends AbstractSimpleObject implements CollectedEventResourceInt
 
     public function setAttributes($attributes)
     {
-        return $this->_set('attributes', $attributes);
+        return $this->setData('attributes', $attributes);
     }
 
     public function getAttributes()

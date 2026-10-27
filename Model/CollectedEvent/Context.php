@@ -9,7 +9,7 @@ class Context extends AbstractSimpleObject implements CollectedEventContextInter
 {
     public function setPageUrl($pageUrl)
     {
-        return $this->_set('page_url', $pageUrl);
+        return $this->setData('page_url', $pageUrl);
     }
 
     public function getPageUrl()
