@@ -6,6 +6,9 @@
     <event name="review_save_after">
         <observer name="review_save_after_post_review" instance="Kangaroorewards\Core\Observer\UpdateReviewObserver" />
     </event>
+    <event name="sales_order_shipment_save_after">
+        <observer name="kangaroo_shipment_created" instance="Kangaroorewards\Core\Observer\ShipmentTrackingObserver" />
+    </event>
     <event name="sales_order_shipment_track_save_after">
         <observer name="kangaroo_shipment_tracking_update" instance="Kangaroorewards\Core\Observer\ShipmentTrackingObserver" />
     </event>

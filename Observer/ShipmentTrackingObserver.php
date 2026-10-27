@@ -32,14 +32,26 @@ class ShipmentTrackingObserver implements ObserverInterface
 
     public function execute(Observer $observer)
     {
-        $track = $observer->getEvent()->getTrack();
-        if (!$track || !$this->trackingDataChanged($track)) {
+        $event = $observer->getEvent();
+        $track = $event->getTrack();
+        $shipment = $event->getShipment();
+
+        if ($track) {
+            if (!$this->trackingDataChanged($track)) {
+                return;
+            }
+            $orderId = (int) $track->getOrderId();
+        } elseif ($shipment) {
+            if (!$this->isNewShipmentWithoutTracking($shipment)) {
+                return;
+            }
+            $orderId = (int) $shipment->getOrderId();
+        } else {
             return;
         }
 
-        $orderId = (int) $track->getOrderId();
         if ($orderId <= 0) {
-            $this->logger->warning('[Kangaroo Rewards] Shipment tracking update has no order ID');
+            $this->logger->warning('[Kangaroo Rewards] Shipment update has no order ID');
             return;
         }
 
@@ -47,6 +59,10 @@ class ShipmentTrackingObserver implements ObserverInterface
             $order = $this->orderRepository->get($orderId);
             $storeId = (int) $order->getStoreId();
             $domain = $this->storeManager->getStore($storeId)->getBaseUrl();
+            $this->logger->info('[Kangaroo Rewards] Shipment update detected', [
+                'order_id' => $orderId,
+                'source' => $track ? 'tracking' : 'shipment',
+            ]);
             $this->endpoint->notifyShipmentUpdate($orderId, $domain, (string) $storeId);
         } catch (\Exception $exception) {
             $this->logger->error('[Kangaroo Rewards] Shipment tracking observer failed', [
@@ -54,6 +70,18 @@ class ShipmentTrackingObserver implements ObserverInterface
                 'error' => $exception->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Shipments created with tracking are handled by the tracking save event.
+     */
+    private function isNewShipmentWithoutTracking($shipment)
+    {
+        if ($shipment->getOrigData('entity_id') !== null) {
+            return false;
+        }
+
+        return count((array) $shipment->getTracks()) === 0;
     }
 
     private function trackingDataChanged($track)
