@@ -1,12 +1,12 @@
 define(
     [
-        "jquery"
+        "jquery",
+        "Magento_Customer/js/customer-data"
     ],
-    function ($) {
+    function ($, customerData) {
         "use strict";
         return function (config) {
             KangarooApps = KangarooApps || {};
-            var productList = [];
             var productDetails = [];
             KangarooApps.Loyalties = KangarooApps.Loyalties || {};
             KangarooApps.Loyalties.version = config.plugin_version;
@@ -75,11 +75,14 @@ define(
             $.getScript(config.kangarooAPIUrl + "/magento/initJS?rc=1&plugin_version=" + config.plugin_version + "&domain=" + encodeURI(config.baseStoreUrl));
 
             function initialLoyaltyCheckout(cart) {
+                var productList = [];
                 cart['cartItems'].forEach(
                     function (item) {
                         var productItem = {
                             code: item["code"],
+                            sku: item["code"],
                             parentId: item["parentId"],
+                            product_id: item["parentId"],
                             variant_id: item["productId"],
                             price: item["price"],
                             quantity: item["quantity"],
@@ -100,7 +103,13 @@ define(
                 }
             }
 
-            $('#product-addtocart-button').on('click', function () {
+            var cartRefreshPending = false;
+
+            function refreshCartInfo() {
+                if (cartRefreshPending) {
+                    return;
+                }
+                cartRefreshPending = true;
                 fetch(config.baseStoreUrl + '/rest/V1/kangaroo/cart-info').then(response => {
                     return response.json();
                 }).then(data => {
@@ -108,8 +117,14 @@ define(
                     if (typeof responseArray.data !== 'undefined' && responseArray.data != null) {
                         initialLoyaltyCheckout(responseArray.data);
                     }
+                }).catch(function () {
+                }).then(function () {
+                    cartRefreshPending = false;
                 });
-            });
+            }
+
+            // The cart section updates after the add-to-cart request completes, on any page
+            customerData.get('cart').subscribe(refreshCartInfo);
         }
     }
 );
