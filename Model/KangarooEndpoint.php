@@ -56,7 +56,6 @@ class KangarooEndpoint implements KangarooEndpointInterface
      */
     protected $productRepository;
 
-
     /**
      * @var \Magento\Catalog\Helper\Image
      */
@@ -78,7 +77,7 @@ class KangarooEndpoint implements KangarooEndpointInterface
      * @param \Magento\Catalog\Helper\Image $imageHelper
      * @param \Magento\Store\Model\App\Emulation $emulation
      * ImageHelper $imageHelper,
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Psr\Log\LoggerInterface                          $logger
      */
     public function __construct(
         InitKangarooApp                                   $kangarooData,
@@ -656,24 +655,36 @@ class KangarooEndpoint implements KangarooEndpointInterface
     }
 
     /**
-     * Forward a storefront event to the integration API.
-     *
-     * @param string $event_type
-     * @param mixed[] $resource
-     * @param string|null $occurred_at
-     * @param mixed[]|null $metadata
-     * @param mixed[]|null $payload
-     * @param mixed[]|null $context
-     * @return string
+     * @inheritdoc
      */
     public function storeCollectedEvent(
         $event_type,
-        $resource,
+        \Kangaroorewards\Core\Api\Data\CollectedEventResourceInterface $resource,
         $occurred_at = null,
-        $metadata = null,
-        $payload = null,
         $context = null
-    ) {
+    )
+    {
+        $resourceData = [
+            'id' => $resource->getId(),
+            'type' => $resource->getType(),
+            'name' => $resource->getName(),
+        ];
+        $attributes = $resource->getAttributes();
+        if ($attributes) {
+            $resourceData['attributes'] = array_filter([
+                'quantity' => $attributes->getQuantity(),
+                'product_id' => $attributes->getProductId(),
+                'variant_id' => $attributes->getVariantId(),
+                'sku' => $attributes->getSku(),
+                'name' => $attributes->getName(),
+                'currency' => $attributes->getCurrency(),
+                'price' => $attributes->getPrice(),
+                'categories' => $attributes->getCategories(),
+            ], function ($value) {
+                return $value !== null;
+            });
+        }
+
         if (!$this->isCustomerLoggedIn()) {
             return json_encode([
                 'active' => false,
@@ -682,19 +693,22 @@ class KangarooEndpoint implements KangarooEndpointInterface
         }
 
         $customer = $this->_getCustomer();
-        $data = array_filter([
+        $data = [
             'event_type' => $event_type,
             'customer_id' => (string) $customer->getId(),
             'domain' => $this->kangarooData->getBaseStoreUrl(),
             'store_id' => (string) $this->kangarooData->getStoreId(),
-            'occurred_at' => $occurred_at,
-            'resource' => $resource,
-            'metadata' => $metadata,
-            'payload' => $payload,
-            'context' => $context,
-        ], function ($value) {
-            return $value !== null;
-        });
+            'resource' => array_filter($resourceData, function ($value) {
+                return $value !== null;
+            }),
+        ];
+
+        if ($occurred_at !== null) {
+            $data['occurred_at'] = $occurred_at;
+        }
+        if ($context !== null && $context->getPageUrl() !== null) {
+            $data['context'] = ['page_url' => $context->getPageUrl()];
+        }
 
         try {
             return $this->request->post('magento/collected-events', $data);

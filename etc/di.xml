@@ -4,6 +4,12 @@
             type="Kangaroorewards\Core\Model\StoreManagement" />
     <preference for="Kangaroorewards\Core\Api\Data\KangarooCredentialInterface"
                 type="Kangaroorewards\Core\Model\KangarooCredential" />
+    <preference for="Kangaroorewards\Core\Api\Data\CollectedEventResourceInterface"
+                type="Kangaroorewards\Core\Model\CollectedEvent\Resource" />
+    <preference for="Kangaroorewards\Core\Api\Data\CollectedEventAttributesInterface"
+                type="Kangaroorewards\Core\Model\CollectedEvent\Attributes" />
+    <preference for="Kangaroorewards\Core\Api\Data\CollectedEventContextInterface"
+                type="Kangaroorewards\Core\Model\CollectedEvent\Context" />
     <preference for="Kangaroorewards\Core\Api\KangarooCredentialRepositoryInterface"
             type="Kangaroorewards\Core\Model\KangarooCredentialRepository" />
     <preference for="Kangaroorewards\Core\Api\KangarooEndpointInterface"
