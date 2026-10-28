@@ -14,4 +14,12 @@
             type="Kangaroorewards\Core\Model\KangarooCredentialRepository" />
     <preference for="Kangaroorewards\Core\Api\KangarooEndpointInterface"
                 type="Kangaroorewards\Core\Model\KangarooEndpoint" />
+    <preference for="Kangaroorewards\Core\Model\ProductState\ProductStateClientInterface"
+                type="Kangaroorewards\Core\Model\ProductState\ProductStateClient" />
+    <preference for="Kangaroorewards\Core\Model\ProductState\ProductLookupInterface"
+                type="Kangaroorewards\Core\Model\ProductState\ProductLookup" />
+    <type name="Magento\InventoryApi\Api\SourceItemsSaveInterface">
+        <plugin name="kangaroo_product_state_source_items_save"
+                type="Kangaroorewards\Core\Plugin\SourceItemsSavePlugin" />
+    </type>
 </config>

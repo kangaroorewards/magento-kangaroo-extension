@@ -31,6 +31,18 @@ class KangarooRewardsRequest
     private $lang;
 
     /**
+     * Per-call timeout override, including token refresh.
+     *
+     * @var int|null
+     */
+    private $timeoutOverride = null;
+
+    /**
+     * @var array{http_code:int,errno:int,error:string}
+     */
+    private $lastResult = ['http_code' => 0, 'errno' => 0, 'error' => ''];
+
+    /**
      * KangarooRewardsRequest constructor.
      * @param KangarooCredentialFactory $credentialFactory
      * @param \Psr\Log\LoggerInterface $logger
@@ -52,15 +64,38 @@ class KangarooRewardsRequest
      * @param array $data
      * @return mixed
      */
-    public function post($path, $data = array())
+    public function post($path, $data = array(), $timeout = null)
     {
-        $token = $this->getKangarooAccessToken();
-        return $this->_request(
-            self::METHOD_POST,
-            $path,
-            $data,
-            $token
-        );
+        $this->timeoutOverride = $timeout !== null ? max(1, (int)$timeout) : null;
+        try {
+            $token = $this->getKangarooAccessToken();
+            return $this->_request(
+                self::METHOD_POST,
+                $path,
+                $data,
+                $token
+            );
+        } finally {
+            $this->timeoutOverride = null;
+        }
+    }
+
+    /**
+     * @return array{http_code:int,errno:int,error:string}
+     */
+    public function getLastResult()
+    {
+        return $this->lastResult;
+    }
+
+    /**
+     * Whether this installation has saved Kangaroo credentials.
+     *
+     * @return bool
+     */
+    public function isConnected()
+    {
+        return $this->findCredential()->getId() !== null;
     }
 
     /**
@@ -109,7 +144,12 @@ class KangarooRewardsRequest
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
+        if ($this->timeoutOverride !== null) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeoutOverride);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->timeoutOverride);
+        } else {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
+        }
         $curlOptPost = ($method === self::METHOD_POST) ? 1 : 0;
         curl_setopt($ch, CURLOPT_POST, $curlOptPost);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
@@ -128,6 +168,11 @@ class KangarooRewardsRequest
         $error = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+        $this->lastResult = [
+            'http_code' => (int)$httpCode,
+            'errno' => (int)$errno,
+            'error' => (string)$error,
+        ];
 
         if ($retry && $httpCode == 401) {
             $this->logger->info('[KangarooRewards] - 401 error - path:' . $path);
@@ -160,7 +205,7 @@ class KangarooRewardsRequest
      * @param $force
      * @throws \Exception
      */
-    public function getKangarooAccessToken($force = false)
+    private function findCredential()
     {
         $existingCredential = $this->credentialFactory->create()->load(1);
         $id = $existingCredential->getId();
@@ -177,6 +222,19 @@ class KangarooRewardsRequest
                 $this->logger->info('[KangarooRewards] - Get kangaroo credential from db. Id:' . $id);
             }
         }
+
+        return $existingCredential;
+    }
+
+    /**
+     * @return string
+     * @param $force
+     * @throws \Exception
+     */
+    public function getKangarooAccessToken($force = false)
+    {
+        $existingCredential = $this->findCredential();
+        $id = $existingCredential->getId();
 
         if (isset($id)) {
             try {

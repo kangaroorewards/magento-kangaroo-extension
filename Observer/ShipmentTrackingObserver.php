@@ -49,8 +49,8 @@ class ShipmentTrackingObserver implements ObserverInterface
             }
             $orderId = (int) $track->getOrderId();
         } elseif ($shipment) {
-            if (!$this->isNewShipmentWithoutTracking($shipment)) {
-                $this->logger->info('[Kangaroo Rewards] Shipment event ignored: not a new shipment without tracking', [
+            if (!$this->isNewShipment($shipment)) {
+                $this->logger->info('[Kangaroo Rewards] Shipment event ignored: shipment already exists', [
                     'shipment_id' => $shipment->getId(),
                 ]);
                 return;
@@ -82,20 +82,17 @@ class ShipmentTrackingObserver implements ObserverInterface
         }
     }
 
-    /**
-     * Shipments created with tracking are handled by the tracking save event.
-     */
-    private function isNewShipmentWithoutTracking($shipment)
+    private function isNewShipment($shipment)
     {
-        if ($shipment->getOrigData('entity_id') !== null) {
-            return false;
-        }
-
-        return count((array) $shipment->getTracks()) === 0;
+        return $shipment->getOrigData('entity_id') === null;
     }
 
     private function trackingDataChanged($track)
     {
+        if ($track->getOrigData('entity_id') === null) {
+            return true;
+        }
+
         foreach (['track_number', 'carrier_code', 'title'] as $field) {
             if ($track->getOrigData($field) !== $track->getData($field)) {
                 return true;

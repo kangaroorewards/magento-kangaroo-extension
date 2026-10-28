@@ -12,4 +12,13 @@
     <event name="sales_order_shipment_track_save_after">
         <observer name="kangaroo_shipment_tracking_update" instance="Kangaroorewards\Core\Observer\ShipmentTrackingObserver" />
     </event>
+    <event name="catalog_product_save_after">
+        <observer name="kangaroo_product_state_product_save" instance="Kangaroorewards\Core\Observer\ProductSaveObserver" />
+    </event>
+    <event name="cataloginventory_stock_item_save_after">
+        <observer name="kangaroo_product_state_stock_item_save" instance="Kangaroorewards\Core\Observer\StockItemSaveObserver" />
+    </event>
+    <event name="catalog_product_attribute_update_before">
+        <observer name="kangaroo_product_state_mass_update" instance="Kangaroorewards\Core\Observer\MassAttributeUpdateObserver" />
+    </event>
 </config>
