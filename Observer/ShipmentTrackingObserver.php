@@ -35,14 +35,24 @@ class ShipmentTrackingObserver implements ObserverInterface
         $event = $observer->getEvent();
         $track = $event->getTrack();
         $shipment = $event->getShipment();
+        $this->logger->warning('[Kangaroo Rewards] Shipment observer invoked', [
+            'event_name' => $event->getName(),
+            'event_data_keys' => array_keys($event->getData()),
+            'has_track' => (bool) $track,
+            'has_shipment' => (bool) $shipment,
+        ]);
 
         if ($track) {
             if (!$this->trackingDataChanged($track)) {
+                $this->logger->info('[Kangaroo Rewards] Shipment tracking event ignored: no tracking change');
                 return;
             }
             $orderId = (int) $track->getOrderId();
         } elseif ($shipment) {
             if (!$this->isNewShipmentWithoutTracking($shipment)) {
+                $this->logger->info('[Kangaroo Rewards] Shipment event ignored: not a new shipment without tracking', [
+                    'shipment_id' => $shipment->getId(),
+                ]);
                 return;
             }
             $orderId = (int) $shipment->getOrderId();
