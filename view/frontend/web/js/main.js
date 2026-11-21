@@ -5,7 +5,14 @@ define(
     ],
     function ($, customerData) {
         "use strict";
+        var initialized = false;
+
         return function (config) {
+            if (initialized) {
+                return;
+            }
+            initialized = true;
+
             KangarooApps = KangarooApps || {};
             var productDetails = [];
             KangarooApps.Loyalties = KangarooApps.Loyalties || {};

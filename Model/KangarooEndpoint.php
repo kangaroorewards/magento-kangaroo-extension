@@ -692,6 +692,15 @@ class KangarooEndpoint implements KangarooEndpointInterface
             ]);
         }
 
+        if (empty($resourceData['attributes']['categories'])) {
+            $categoryIds = $this->getCollectedEventCategoryIds(
+                $resourceData['attributes']['product_id'] ?? $resourceData['id'] ?? null
+            );
+            if (!empty($categoryIds)) {
+                $resourceData['attributes']['categories'] = $categoryIds;
+            }
+        }
+
         $customer = $this->_getCustomer();
         $data = [
             'event_type' => $event_type,
@@ -720,6 +729,28 @@ class KangarooEndpoint implements KangarooEndpointInterface
 
             return json_encode(['active' => false, 'error' => $exception->getMessage()]);
         }
+    }
+
+    /**
+     * Storefront events carry the child product's categories, which are often empty because Magento
+     * assigns categories to the configurable parent; the event's product_id is the parent id.
+     *
+     * @param mixed $productId
+     * @return string[]
+     */
+    private function getCollectedEventCategoryIds($productId)
+    {
+        if (empty($productId) || !is_numeric($productId)) {
+            return [];
+        }
+
+        try {
+            $product = $this->productRepository->getById((int) $productId);
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+            return [];
+        }
+
+        return array_values(array_map('strval', (array) $product->getCategoryIds()));
     }
 
     /**
