@@ -21,9 +21,6 @@
             <resource name="Magento_Catalog::products" />
             <resource name="Magento_Catalog::categories" />
 
-            <!-- read stock quantities for product state webhooks (GET /V1/stockItems/:sku) -->
-            <resource name="Magento_CatalogInventory::cataloginventory" />
-
             <resource name="Magento_Cart::cart" />
             <resource name="Magento_Cart::manage" />
 
